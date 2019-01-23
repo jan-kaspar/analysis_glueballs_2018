@@ -1,0 +1,31 @@
+#!/bin/bash
+
+# settings
+export HOME="/afs/cern.ch/exp/totem/scratch/jkaspar"
+export X509_USER_PROXY="/afs/cern.ch/user/j/jkaspar/x509up_u2177"
+
+# init CMSSW
+source "/cvmfs/cms.cern.ch/cmsset_default.sh"
+cd "$CMSSW_BASE"
+eval `scramv1 runtime -sh`
+
+# go to work directory
+cd "$WORK_DIR" || exit
+
+date > "submitted"
+
+# run cmsRun
+cmsRun "cfg.py" &> "log"
+rc=$?
+if [ $rc -ne 0 ]
+then
+    echo "cmsRun crashed: return code = $rc"
+	rm -rf "output.root"
+	date > "finished"
+    exit 1
+fi
+
+date > "finished"
+date > "success"
+
+echo "SUCCESS"

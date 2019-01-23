@@ -1,0 +1,183 @@
+#!/bin/bash
+
+work_dir="./"
+
+#----------------------------------------------------------------------------------------------------
+
+function PrintUsage()
+{
+	echo "USAGE: wd_control <option> <command> <option> ..."
+	echo "COMMANDS:"
+	echo "    print                   print directory name"
+	echo "    clean                   clean status and products"
+	echo "    remove                  remove directory"
+	echo "    resubmit                resubmit"
+	echo "OPTIONS:"
+	echo "    -h, --help              print this help and exit"
+	echo "    -s <selection>          set directory selection rule:"
+	echo "        finished            job has saved 'finished' file"
+	echo "        success             job has saved 'success' file"
+	echo "        crashed             job has saved 'finished' but no 'success' file"
+	echo "        unsubmitted         job has not 'submitted' file"
+	echo "        unfinished          job has 'submitted' but not 'finished' file"
+	echo "    -queue <q>              use the specified LXBATCH queue"
+}
+
+#----------------------------------------------------------------------------------------------------
+
+# defaults
+selection=""
+comm=""
+
+queue="1nd"
+
+# parse command line
+while [ -n "$1" ]
+do
+	case "$1" in
+		"-h" | "--help")
+			PrintUsage
+			exit 0
+			;;
+
+        "-s")
+			shift
+            selection="$1"
+            ;;
+
+        "-queue")
+			shift
+            queue="$1"
+            ;;
+
+		"print" | "clean" | "remove" | "resubmit")
+			comm="$1"
+			;;
+         
+        *)
+			echo "ERROR: command/option '$1' not understood."
+			PrintUsage
+            exit 1
+	esac
+
+	shift
+done
+
+# command given?
+if [ -z "$comm" ]
+then
+	echo "ERROR: no command given"
+	PrintUsage
+	exit 1
+fi
+
+# selection given?
+if [ -z "$selection" ]
+then
+	echo "ERROR: no selection given"
+	PrintUsage
+	exit 1
+fi
+
+# validate selection
+case "$selection" in
+	"finished" | "success" | "crashed" | "unsubmitted" | "unfinished")
+		;;
+	*)
+		echo "ERROR: selection '$selection' not understood."
+		PrintUsage
+		exit 1
+esac
+
+# process all directory entries
+find "$work_dir" -type d|while read entry
+do
+	# skip non-directory entries
+	if [ ! -d "$entry" ]
+	then
+		continue
+	fi
+
+	# skip non-final directoris
+	if [ ! -f "$entry/job" ]
+	then
+		continue
+	fi
+
+	# is selected ?
+	selected="f"
+	case "$selection" in
+		"finished")
+				if [ -f "$entry/finished" ]
+				then
+					selected="t"
+				fi
+			;;
+
+		"success")
+				if [ -f "$entry/success" ]
+				then
+					selected="t"
+				fi
+			;;
+
+		"crashed")
+				if [ -f "$entry/finished" -a ! -f "$entry/success" ]
+				then
+					selected="t"
+				fi
+			;;
+
+		"unsubmitted")
+				if [ ! -f "$entry/submitted" ]
+				then
+					selected="t"
+				fi
+			;;
+
+		"unfinished")
+				# TODO
+				#if [ -f "$entry/submitted" -a ! -f "$entry/finished" ]
+				if [ -f "$entry/submitted" -a ! -f "$entry/success" ]
+				then
+					selected="t"
+				fi
+			;;
+	esac
+
+	# skip not selected
+	if [ "$selected" != "t" ]
+	then
+		continue
+	fi
+
+	# execute command
+	case "$comm" in
+		"print")
+				echo "$entry"
+			;;
+
+		"clean")
+				echo "cleaning: $entry"
+				rm -rf "$entry/submitted"
+				rm -rf "$entry/finished"
+				rm -rf "$entry/success"
+				rm -rf $entry/*.root
+			;;
+
+		"remove")
+				echo "removing: $entry"
+				rm -rf "$entry"
+			;;
+
+		"resubmit")
+				echo "resubmitting: $entry"
+
+				cwd=`pwd -P`
+				result=`bsub -q "$queue" -o /dev/null -e /dev/null "$cwd/$entry/job"`
+				echo "    $result"
+				echo "$result" > "$entry/submitted"
+				rm -f "$entry/finished"
+			;;
+	esac
+done

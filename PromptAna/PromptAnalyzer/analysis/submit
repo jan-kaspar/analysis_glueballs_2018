@@ -1,0 +1,107 @@
+#!/bin/bash
+
+#----------------------------------------------------------------------------------------------------
+
+function PrintUsage()
+{
+	echo "USAGE: submit [job name] [input file]"
+}
+
+#----------------------------------------------------------------------------------------------------
+
+function MakeJob()
+{
+	job_file="$dir/job"
+
+	cat "job_template" | sed "\
+			s|\$WORK_DIR|$cwd/$dir|;\
+			s|\$CMSSW_BASE|$CMSSW_BASE|;\
+		" > "$job_file"
+
+	chmod u+x "$job_file"
+}
+
+#----------------------------------------------------------------------------------------------------
+
+function MakeCfg()
+{
+	cfg_file="$dir/cfg.py"
+
+	cat "template_cfg.py" | sed "\
+			s|\$INPUT|$input_file|;\
+		" > "$cfg_file"
+}
+
+#----------------------------------------------------------------------------------------------------
+
+job_name="$1"
+input_file="$2"
+
+cwd=`pwd -P`
+
+if [ -z "$job_name" -o -z "$input_file" ]
+then
+	PrintUsage
+	exit 1
+fi
+
+mkdir -p "$job_name"
+
+sub_script="$job_name/condor.sub"
+
+base_dir="$cwd/$job_name"
+
+(
+	echo "executable = $base_dir/\$(dir)/job"
+	echo "arguments = \$(ClusterId) \$(ProcId) \\\"\$(dir)\\\""
+	echo "output = $base_dir/\$(dir)/out"
+	echo "error = $base_dir/\$(dir)/err"
+	echo "log = $base_dir/condor.log"
+
+	#echo "+JobFlavour = \"espresso\"" # 20 minutes
+	#echo "+JobFlavour = \"microcentury\"" # 1 hour
+	echo "+MaxRuntime = 7200" # in s
+
+	echo "+JobBatchName = \"$job_name\""
+
+	echo "requirements = (OpSysAndVer =?= \"SLCern6\")"
+
+) > "$sub_script"
+
+idx=0
+for input_file in `cat $input_file`
+do
+	dir="$job_name/$idx"
+	echo "* $dir"
+
+	# make and clean directory
+	mkdir -p "$dir"
+
+	rm -f "$dir/submitted"
+	rm -f "$dir/finished"
+	rm -f "$dir/success"
+
+	rm -f "$dir/out"
+	rm -f "$dir/err"
+	rm -f "$dir/log"
+	rm -f "$dir/output.root"
+
+	MakeJob
+
+	MakeCfg
+
+	#queue="1nh"
+	#result=`bsub -q $queue -o /dev/null -e /dev/null "$cwd/$dir/job"`
+	#echo "    $result"
+
+	(
+		echo ""
+		echo "dir=$idx"
+		echo "queue"
+	) >> "$sub_script"
+
+	let idx=$idx+1
+done
+
+echo "Submitting ..."
+condor_submit "$sub_script"

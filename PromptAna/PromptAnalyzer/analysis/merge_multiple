@@ -1,0 +1,55 @@
+#!/bin/bash
+
+function MergeOneRun()
+{
+	local dir="$1"
+
+	echo "* $dir"
+
+	cd "$dir" || return
+
+	rm "merged.root"
+	hadd "merged.root" */output.root || exit
+
+	cd - > /dev/null
+}
+
+#----------------------------------------------------------------------------------------------------
+
+function MergeOneDataSet()
+{
+	local dir="$1"
+
+	cd "$dir" || return
+
+	rm "merged.root"
+	hadd "merged.root" */merged.root || exit
+
+	cd - > /dev/null
+}
+
+#----------------------------------------------------------------------------------------------------
+
+MergeOneRun "TOTEM2/319176"
+MergeOneRun "TOTEM2/319256"
+MergeOneRun "TOTEM2/319262"
+MergeOneRun "TOTEM2/319263"
+MergeOneRun "TOTEM2/319265"
+MergeOneRun "TOTEM2/319268"
+MergeOneRun "TOTEM2/319300"
+MergeOneRun "TOTEM2/319311"
+
+MergeOneDataSet "TOTEM2"
+
+#-----
+
+MergeOneRun "TOTEM4/319176"
+MergeOneRun "TOTEM4/319256"
+MergeOneRun "TOTEM4/319262"
+MergeOneRun "TOTEM4/319263"
+MergeOneRun "TOTEM4/319265"
+MergeOneRun "TOTEM4/319268"
+MergeOneRun "TOTEM4/319300"
+MergeOneRun "TOTEM4/319311"
+
+MergeOneDataSet "TOTEM4"

@@ -1,0 +1,12 @@
+Totem1: double arm (trigger on 220F)
+Totem2: exclusive diagonal (2nd fork)
+Totem3: not yet working
+Totem4: TTBB exclusive
+
+----------------------------------------------------------------------------------------------------
+
+./submit_multiple
+
+./merge_multiple
+
+----------------------------------------------------------------------------------------------------
