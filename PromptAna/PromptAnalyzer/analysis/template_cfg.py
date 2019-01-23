@@ -25,7 +25,7 @@ process.source = cms.Source("PoolSource",
   fileNames = cms.untracked.vstring($INPUT)
 )
 
-process.analyzer = cms.EDAnalyzer('PromptAnalyzer',
+process.analyzer = cms.EDAnalyzer("PromptAnalyzer",
   tracks = cms.InputTag('generalTracks'),
   dedxs = cms.InputTag('dedxHarmonic2'),
   dedxPIXs = cms.InputTag('dedxPixelHarmonic2'),
@@ -35,10 +35,6 @@ process.analyzer = cms.EDAnalyzer('PromptAnalyzer',
   triggers = cms.InputTag('TriggerResults','','HLT'),
   pflows = cms.InputTag('particleFlow'),
   muons = cms.InputTag('muons')
-)
-
-process.TFileService = cms.Service("TFileService",
-  fileName = cms.string('output.root')
 )
 
 process.p = cms.Path(process.analyzer)
