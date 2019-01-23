@@ -274,6 +274,11 @@ void PromptAnalyzer::beginJob()
   histosTH1F["hm4PHImass4curves"] = new TH1F("hm4PHImass4curves", "M_{4K}, #varphi#varphi + 4K curves",massbins4,0.,10.);
   histosTH1F["hm4PHImass3curves"] = new TH1F("hm4PHImass3curves", "M_{4K}, #varphi#varphi + 3K curves",massbins4,0.,10.);
   histosTH1F["hm4PHImass34curves"] = new TH1F("hm4PHImass34curves", "M_{4K}, #varphi#varphi + >=3Kcurves",massbins4,0.,10.);
+  histosTH1F["hm4PHImass34curves2S"] = new TH1F("hm4PHImass34curves2S", "M_{4K}, #varphi#varphi + >=3Kcurves or 2K same sign",massbins4,0.,10.);
+
+  histosTH1F["hm4PHImass_PhiCutStrict"] = new TH1F("hm4PHImass_PhiCutStrict", "M_{4K}, #varphi#varphi",massbins4,0.,10.);
+  histosTH1F["hm4PHImass34curves_PhiCutStrict"] = new TH1F("hm4PHImass34curves_PhiCutStrict", "M_{4K}, #varphi#varphi + >=3Kcurves",massbins4,0.,10.);
+  histosTH1F["hm4PHImass34curves2S_PhiCutStrict"] = new TH1F("hm4PHImass34curves2S_PhiCutStrict", "M_{4K}, #varphi#varphi + >=3Kcurves or 2K same sign",massbins4,0.,10.);
 
   //-----
 
@@ -302,7 +307,11 @@ void PromptAnalyzer::beginJob()
   histosTH1F["hmrhootherKen0"] = new TH1F("hmrhootherKen0","M_{#pi#pi} if #rho",massbins,0,5.);
 
   histosTH1F["hmALLkKen0"] = new TH1F("hmALLkKen0","M_{KK}",massbins,0,5.);
+
   histosTH1F["hmphiotherKen0"] = new TH1F("hmphiotherKen0","M_{KK} if #varphi",massbins,0,5.);
+  histosTH1F["hmphiotherKen0_PhiCutStrict"] = new TH1F("hmphiotherKen0_PhiCutStrict","M_{KK} if #varphi",massbins,0,5.);
+
+  histosTH2F["hmALLkKen0_2D"] = new TH2F("hmALLkKen0_2D","M_{22 or 21}(KK) vs. M_{11 or 12}(KK)", 80, 0.9, 1.3, 80, 0.9, 1.3);
 
   histosTH1F["hmKSother"] = new TH1F("hmKSother","M_{K#pi} if K*(892)",massbins,0,5.);
 
@@ -1076,8 +1085,8 @@ void PromptAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 
     if (allCuts4)
     {
-      int nKcurves=0;
       int nPIcurves=0;
+      int nKcurves=0, nKcurvesPos=0, nKcurvesNeg=0;
 
       int itref4=0;
       for (TrackCollection::const_iterator itTrack = tracks->begin(); itTrack != tracks->end(); ++itTrack)
@@ -1093,8 +1102,17 @@ void PromptAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
           histosTH2F["hdedx4trk"]->Fill(itTrack->p(),thisdedxPIX);
           histosTH2F["hdedx4trklog"]->Fill(itTrack->p(),TMath::Log10(thisdedxPIX));
 
-          if ( isKaonCurve(itTrack->p(),thisdedxPIX) ) nKcurves++;
-          if ( isPionCurve(itTrack->p(),thisdedxPIX) ) nPIcurves++;
+          if (isPionCurve(itTrack->p(), thisdedxPIX)) nPIcurves++;
+
+          if (isKaonCurve(itTrack->p(), thisdedxPIX))
+          {
+            nKcurves++;
+
+            if (itTrack->charge() > 0)
+              nKcurvesPos++;
+            if (itTrack->charge() < 0)
+              nKcurvesNeg++;
+          }
         }
       }
 
@@ -1190,26 +1208,52 @@ void PromptAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       double m12k=k4m12.M();
       double m21k=k4m21.M();
 
-      double phiCut=0.02;
+      const double phiCen = 1.02;
+      const double phiCut = 0.02;
+      const double phiCutStrict = 0.01;
 
       histosTH1F["hmALLkKen0"]->Fill(m11k);
       histosTH1F["hmALLkKen0"]->Fill(m12k);
 
-      if(fabs(m11k-1.02)<phiCut) histosTH1F["hmphiotherKen0"]->Fill(m22k);
-      if(fabs(m12k-1.02)<phiCut) histosTH1F["hmphiotherKen0"]->Fill(m21k);
+      histosTH2F["hmALLkKen0_2D"]->Fill(m11k, m22k);
+      histosTH2F["hmALLkKen0_2D"]->Fill(m12k, m21k);
 
-      int nOKpid=0;
-      if(fabs(m11k-1.02)<phiCut && fabs(m22k-1.02)<phiCut) nOKpid++;
-      if(fabs(m12k-1.02)<phiCut && fabs(m21k-1.02)<phiCut) nOKpid++;
+      if (fabs(m11k - phiCen) < phiCut) histosTH1F["hmphiotherKen0"]->Fill(m22k);
+      if (fabs(m12k - phiCen) < phiCut) histosTH1F["hmphiotherKen0"]->Fill(m21k);
 
-      if (nOKpid>0)
+      if (fabs(m11k - phiCen) < phiCutStrict) histosTH1F["hmphiotherKen0_PhiCutStrict"]->Fill(m22k);
+      if (fabs(m12k - phiCen) < phiCutStrict) histosTH1F["hmphiotherKen0_PhiCutStrict"]->Fill(m21k);
+
+      unsigned int nOKPhiCut = 0;
+      if (fabs(m11k - phiCen) < phiCut && fabs(m22k - phiCen) < phiCut) nOKPhiCut++;
+      if (fabs(m12k - phiCen) < phiCut && fabs(m21k - phiCen) < phiCut) nOKPhiCut++;
+
+      unsigned int nOKPhiCutStrict = 0;
+      if (fabs(m11k - phiCen) < phiCutStrict && fabs(m22k - phiCen) < phiCutStrict) nOKPhiCutStrict++;
+      if (fabs(m12k - phiCen) < phiCutStrict && fabs(m21k - phiCen) < phiCutStrict) nOKPhiCutStrict++;
+
+      bool twoKaonsOfTheSameSign = (nKcurvesPos == 2 || nKcurvesNeg == 2);
+
+      if (nOKPhiCut > 0)
       {
         histosTH1F["hm4PHImass"]->Fill(mrec4k);
 
         histosTH1F["hnKcurves"]->Fill(nKcurves);
-        if(nKcurves==4) histosTH1F["hm4PHImass4curves"]->Fill(mrec4k);
-        if(nKcurves==3) histosTH1F["hm4PHImass3curves"]->Fill(mrec4k);
-        if(nKcurves>=3) histosTH1F["hm4PHImass34curves"]->Fill(mrec4k);
+        if (nKcurves == 4) histosTH1F["hm4PHImass4curves"]->Fill(mrec4k);
+        if (nKcurves == 3) histosTH1F["hm4PHImass3curves"]->Fill(mrec4k);
+        if (nKcurves >= 3) histosTH1F["hm4PHImass34curves"]->Fill(mrec4k);
+
+        if (nKcurves >= 3 || twoKaonsOfTheSameSign) histosTH1F["hm4PHImass34curves2S"]->Fill(mrec4k);
+      }
+
+      if (nOKPhiCutStrict > 0)
+      {
+        histosTH1F["hm4PHImass_PhiCutStrict"]->Fill(mrec4k);
+
+        histosTH1F["hnKcurves_PhiCutStrict"]->Fill(nKcurves);
+
+        if (nKcurves >= 3) histosTH1F["hm4PHImass34curves_PhiCutStrict"]->Fill(mrec4k);
+        if (nKcurves >= 3 || twoKaonsOfTheSameSign) histosTH1F["hm4PHImass34curves2S_PhiCutStrict"]->Fill(mrec4k);
       }
 
       //------------------------------------------
