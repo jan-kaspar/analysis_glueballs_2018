@@ -109,10 +109,10 @@ class PromptAnalyzer : public edm::one::EDAnalyzer<>
     edm::EDGetTokenT<reco::DeDxHitInfoAss> dedxpixelToken_ ;
     edm::EDGetTokenT<vector<CTPPSLocalTrackLite> > RPtrkToken_;
     edm::EDGetTokenT<reco::VertexCollection> vtxToken_;
-    // edm::EDGetTokenT<edm::TriggerResults>  trigToken_;
+    //edm::EDGetTokenT<edm::TriggerResults>  trigToken_;
     edm::EDGetTokenT<reco::PFCandidateCollection> pfToken_;
     edm::EDGetTokenT<reco::MuonCollection> muToken_;
-    // edm::EDGetTokenT<edmNew::DetSetVector<SiPixelCluster> > clusterToken_;
+    //edm::EDGetTokenT<edmNew::DetSetVector<SiPixelCluster> > clusterToken_;
 
   map<string, TH1F*> histosTH1F;
   map<string, TH2F*> histosTH2F;
@@ -259,6 +259,8 @@ void PromptAnalyzer::beginJob()
   histosTH1F["hm4PHIscaled2"] = new TH1F("hm4PHIscaled2", "M_{4K}", massbins4,0.,10.);
 
   histosTH1F["hnKcurves"] = new TH1F("hnKcurves","N K curves in phiphi mass region",5,0,5.);
+  histosTH1F["hnKcurves_PhiCutStrict"] = new TH1F("hnKcurves","N K curves in phiphi mass region",5,0,5.);
+
   histosTH1F["hnPIcurvesSIG1"] = new TH1F("hnPIcurvesSIG1","N #pi curves in rhorho mass region",5,0,5.);
   histosTH1F["hnPIcurvesSIG2"] = new TH1F("hnPIcurvesSIG2","N #pi curves in rhorho mass region",5,0,5.);
 
@@ -1133,6 +1135,9 @@ void PromptAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       histosTH1F["heta4"]->Fill(pi4pos2.Eta());
       histosTH1F["heta4"]->Fill(pi4neg2.Eta());
 
+      //------------------------
+      // rho-rho
+
       TLorentzVector pi4m11(0.,0.,0.,0.);
       TLorentzVector pi4m22(0.,0.,0.,0.);
       TLorentzVector pi4m12(0.,0.,0.,0.);
@@ -1191,22 +1196,17 @@ void PromptAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       // phi-phi
       // kaons
 
-      TLorentzVector k4m11(0.,0.,0.,0.);
-      TLorentzVector k4m22(0.,0.,0.,0.);
-      TLorentzVector k4m12(0.,0.,0.,0.);
-      TLorentzVector k4m21(0.,0.,0.,0.);
+      TLorentzVector k4m11 = k4pos1 + k4neg1;
+      TLorentzVector k4m22 = k4pos2 + k4neg2;
 
-      k4m11=k4pos1+k4neg1;
-      k4m22=k4pos2+k4neg2;
+      TLorentzVector k4m12 = k4pos1 + k4neg2;
+      TLorentzVector k4m21 = k4pos2 + k4neg1;
 
-      k4m12=k4pos1+k4neg2;
-      k4m21=k4pos2+k4neg1;
+      const double m11k = k4m11.M();
+      const double m22k = k4m22.M();
 
-      double m11k=k4m11.M();
-      double m22k=k4m22.M();
-
-      double m12k=k4m12.M();
-      double m21k=k4m21.M();
+      const double m12k = k4m12.M();
+      const double m21k = k4m21.M();
 
       const double phiCen = 1.02;
       const double phiCut = 0.02;
