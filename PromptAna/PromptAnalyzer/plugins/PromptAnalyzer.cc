@@ -378,17 +378,20 @@ void PromptAnalyzer::endJob()
 
 bool PromptAnalyzer::isKaonCurve(double p, double dEdx)
 {
-  bool iskappa = false;
+  bool isKaon = false;
 
   // 3sigma curves based on 2018 data with pbins=2
-  double ku3 = 4.53163e+00-5.89828e-01*p + exp(3.16431e+00-5.38011e+00*p);
-  double kd3 = 1.46882e+00-9.31222e-04*p + exp(2.12237e+00-4.34300e+00*p);
-  double piu3 = 3.49965e+00-2.88850e-01*atan(p-1.51050e+00) + exp(3.03012e+00-1.53867e+01*p);
+  const double ku3 = 4.53163e+00-5.89828e-01*p + exp(3.16431e+00-5.38011e+00*p);
+  const double kd3 = 1.46882e+00-9.31222e-04*p + exp(2.12237e+00-4.34300e+00*p);
+  const double piu3 = 3.49965e+00-2.88850e-01*atan(p-1.51050e+00) + exp(3.03012e+00-1.53867e+01*p);
 
-  if (dEdx < max(ku3,piu3) && dEdx > kd3)
-    iskappa = true;
+  const double lb = max(kd3, piu3);
+  const double ub = ku3;
 
-  return iskappa;
+  if (dEdx > lb && dEdx < ub)
+    isKaon = true;
+
+  return isKaon;
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -406,7 +409,6 @@ bool PromptAnalyzer::isPionCurve(double p, double dEdx)
     ispion = true;
 
   return ispion;
-
 }
 
 //----------------------------------------------------------------------------------------------------
