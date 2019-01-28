@@ -71,7 +71,8 @@ base_dir="$cwd/$job_name"
 idx=0
 for input_file in `cat $input_file`
 do
-	dir="$job_name/$idx"
+	idxDir="idx$idx"
+	dir="$job_name/$idxDir"
 	echo "* $dir"
 
 	# make and clean directory
@@ -90,13 +91,9 @@ do
 
 	MakeCfg
 
-	#queue="1nh"
-	#result=`bsub -q $queue -o /dev/null -e /dev/null "$cwd/$dir/job"`
-	#echo "    $result"
-
 	(
 		echo ""
-		echo "dir=$idx"
+		echo "dir=$idxDir"
 		echo "queue"
 	) >> "$sub_script"
 
