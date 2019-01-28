@@ -259,28 +259,46 @@ void PromptAnalyzer::beginJob()
   histosTH1F["hm4PHIscaled2"] = new TH1F("hm4PHIscaled2", "M_{4K}", massbins4,0.,10.);
 
   histosTH1F["hnKcurves"] = new TH1F("hnKcurves","N K curves in phiphi mass region",5,0,5.);
-  histosTH1F["hnKcurves_PhiCutStrict"] = new TH1F("hnKcurves","N K curves in phiphi mass region",5,0,5.);
+  histosTH1F["hnKcurves_PhiCutStrict"] = new TH1F("hnKcurves_PhiCutStrict","N K curves in phiphi mass region",5,0,5.);
 
   histosTH1F["hnPIcurvesSIG1"] = new TH1F("hnPIcurvesSIG1","N #pi curves in rhorho mass region",5,0,5.);
   histosTH1F["hnPIcurvesSIG2"] = new TH1F("hnPIcurvesSIG2","N #pi curves in rhorho mass region",5,0,5.);
 
   histosTH1F["hm4SIG1mass"] = new TH1F("hm4SIG1mass", "M_{#rho#rho} #sigma", massbins4,0.,10.);
   histosTH1F["hm4SIG1mass4curves"] = new TH1F("hm4SIG1mass4curves", "M_{#rho#rho} #sigma + 4#pi curves", massbins4,0.,10.);
-  histosTH1F["hm4SIG1mass34curves"] = new TH1F("hm4SIG1mass34curves", "M_{#rho#rho} #sigma +>34#pi curves", massbins4,0.,10.);
+  histosTH1F["hm4SIG1mass34curves"] = new TH1F("hm4SIG1mass34curves", "M_{#rho#rho} #sigma + >=3#pi curves", massbins4,0.,10.);
+  histosTH1F["hm4SIG1mass234curves"] = new TH1F("hm4SIG1mass234curves", "M_{#rho#rho} #sigma + >=2#pi curves", massbins4,0.,10.);
+  histosTH1F["hm4SIG1mass1234curves"] = new TH1F("hm4SIG1mass1234curves", "M_{#rho#rho} #sigma + >1=#pi curves", massbins4,0.,10.);
 
   histosTH1F["hm4SIG2mass"] = new TH1F("hm4SIG2mass", "M_{#rho#rho} #sigma/2", massbins4,0.,10.);
   histosTH1F["hm4SIG2mass4curves"] = new TH1F("hm4SIG2mass4curves", "M_{#rho#rho} #sigma/2 + 4#pi curves", massbins4,0.,10.);
-  histosTH1F["hm4SIG2mass34curves"] = new TH1F("hm4SIG2mass34curves", "M_{#rho#rho} #sigma/2 +>=3#pi curves", massbins4,0.,10.);
+  histosTH1F["hm4SIG2mass34curves"] = new TH1F("hm4SIG2mass34curves", "M_{#rho#rho} #sigma/2 + >=3#pi curves", massbins4,0.,10.);
+  histosTH1F["hm4SIG2mass234curves"] = new TH1F("hm4SIG2mass234curves", "M_{#rho#rho} #sigma/2 + >=2#pi curves", massbins4,0.,10.);
+  histosTH1F["hm4SIG2mass1234curves"] = new TH1F("hm4SIG2mass1234curves", "M_{#rho#rho} #sigma/2 + >=1#pi curves", massbins4,0.,10.);
 
   histosTH1F["hm4PHImass"] = new TH1F("hm4PHImass", "M_{4K}, #varphi#varphi",massbins4,0.,10.);
   histosTH1F["hm4PHImass4curves"] = new TH1F("hm4PHImass4curves", "M_{4K}, #varphi#varphi + 4K curves",massbins4,0.,10.);
   histosTH1F["hm4PHImass3curves"] = new TH1F("hm4PHImass3curves", "M_{4K}, #varphi#varphi + 3K curves",massbins4,0.,10.);
-  histosTH1F["hm4PHImass34curves"] = new TH1F("hm4PHImass34curves", "M_{4K}, #varphi#varphi + >=3Kcurves",massbins4,0.,10.);
-  histosTH1F["hm4PHImass34curves2S"] = new TH1F("hm4PHImass34curves2S", "M_{4K}, #varphi#varphi + >=3Kcurves or 2K same sign",massbins4,0.,10.);
+  histosTH1F["hm4PHImass34curves"] = new TH1F("hm4PHImass34curves", "M_{4K}, #varphi#varphi + >=3K curves",massbins4,0.,10.);
+  histosTH1F["hm4PHImass234curves"] = new TH1F("hm4PHImass234curves", "M_{4K}, #varphi#varphi + >=2K curves",massbins4,0.,10.);
+  histosTH1F["hm4PHImass1234curves"] = new TH1F("hm4PHImass1234curves", "M_{4K}, #varphi#varphi + >=1K curves",massbins4,0.,10.);
+
+  histosTH1F["hm4PHImassPiVeto"] = new TH1F("hm4PHImassPiVeto", "M_{4K}, #varphi#varphi + Pion Veto",massbins4,0.,10.);
+  histosTH1F["hm4PHImass1234curvesPiVeto"] = new TH1F("hm4PHImass1234curvesPiVeto", "M_{4K}, #varphi#varphi + >=1K curves + Pion Veto",massbins4,0.,10.);
+
+  histosTH1F["hm4PHImass34curves2SS"] = new TH1F("hm4PHImass34curves2SS", "M_{4K}, #varphi#varphi + >=3K curves or 2K same sign",massbins4,0.,10.);
 
   histosTH1F["hm4PHImass_PhiCutStrict"] = new TH1F("hm4PHImass_PhiCutStrict", "M_{4K}, #varphi#varphi",massbins4,0.,10.);
-  histosTH1F["hm4PHImass34curves_PhiCutStrict"] = new TH1F("hm4PHImass34curves_PhiCutStrict", "M_{4K}, #varphi#varphi + >=3Kcurves",massbins4,0.,10.);
-  histosTH1F["hm4PHImass34curves2S_PhiCutStrict"] = new TH1F("hm4PHImass34curves2S_PhiCutStrict", "M_{4K}, #varphi#varphi + >=3Kcurves or 2K same sign",massbins4,0.,10.);
+  histosTH1F["hm4PHImass4curves_PhiCutStrict"] = new TH1F("hm4PHImass4curves_PhiCutStrict", "M_{4K}, #varphi#varphi + 4K curves",massbins4,0.,10.);
+  histosTH1F["hm4PHImass3curves_PhiCutStrict"] = new TH1F("hm4PHImass3curves_PhiCutStrict", "M_{4K}, #varphi#varphi + 3K curves",massbins4,0.,10.);
+  histosTH1F["hm4PHImass34curves_PhiCutStrict"] = new TH1F("hm4PHImass34curves_PhiCutStrict", "M_{4K}, #varphi#varphi + >=3K curves",massbins4,0.,10.);
+  histosTH1F["hm4PHImass234curves_PhiCutStrict"] = new TH1F("hm4PHImass234curves_PhiCutStrict", "M_{4K}, #varphi#varphi + >=2K curves",massbins4,0.,10.);
+  histosTH1F["hm4PHImass1234curves_PhiCutStrict"] = new TH1F("hm4PHImass1234curves_PhiCutStrict", "M_{4K}, #varphi#varphi + >=1K curves",massbins4,0.,10.);
+
+  histosTH1F["hm4PHImassPiVeto_PhiCutStrict"] = new TH1F("hm4PHImassPiVeto_PhiCutStrict", "M_{4K}, #varphi#varphi + PiVeto",massbins4,0.,10.);
+  histosTH1F["hm4PHImass1234curvesPiVeto_PhiCutStrict"] = new TH1F("hm4PHImass1234curvesPiVeto_PhiCutStrict", "M_{4K}, #varphi#varphi + >=1K curves + PiVeto",massbins4,0.,10.);
+
+  histosTH1F["hm4PHImass34curves2SS_PhiCutStrict"] = new TH1F("hm4PHImass34curves2SS_PhiCutStrict", "M_{4K}, #varphi#varphi + >=3K curves or 2K same sign",massbins4,0.,10.);
 
   //-----
 
@@ -306,6 +324,9 @@ void PromptAnalyzer::beginJob()
 
   //---------
   histosTH1F["hmALLpiKen0"] = new TH1F("hmALLpiKen0","M_{#pi#pi}",massbins,0,5.);
+
+  histosTH2F["hmALLpiKen0_2D"] = new TH2F("hmALLpiKen0_2D","M_{22 or 21}(#pi#pi) vs. M_{11 or 12}(#pi#pi)", 80, 0.4, 1.2, 80, 0.4, 1.2);
+
   histosTH1F["hmrhootherKen0"] = new TH1F("hmrhootherKen0","M_{#pi#pi} if #rho",massbins,0,5.);
 
   histosTH1F["hmALLkKen0"] = new TH1F("hmALLkKen0","M_{KK}",massbins,0,5.);
@@ -1138,69 +1159,71 @@ void PromptAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       //------------------------
       // rho-rho
 
-      TLorentzVector pi4m11(0.,0.,0.,0.);
-      TLorentzVector pi4m22(0.,0.,0.,0.);
-      TLorentzVector pi4m12(0.,0.,0.,0.);
-      TLorentzVector pi4m21(0.,0.,0.,0.);
+      const TLorentzVector pi4m11 = pi4pos1 + pi4neg1;
+      const TLorentzVector pi4m22 = pi4pos2 + pi4neg2;
 
-      pi4m11=pi4pos1+pi4neg1;
-      pi4m22=pi4pos2+pi4neg2;
+      const TLorentzVector pi4m12 = pi4pos1 + pi4neg2;
+      const TLorentzVector pi4m21 = pi4pos2 + pi4neg1;
 
-      pi4m12=pi4pos1+pi4neg2;
-      pi4m21=pi4pos2+pi4neg1;
+      const double m11 = pi4m11.M();
+      const double m22 = pi4m22.M();
 
-      double m11=pi4m11.M();
-      double m22=pi4m22.M();
+      const double m12 = pi4m12.M();
+      const double m21 = pi4m21.M();
 
-      double m12=pi4m12.M();
-      double m21=pi4m21.M();
-
-      double rhoM=0.77;
-      double rhoCut=0.124; //62, 31
-      double rhoCut2=rhoCut/2.;
-      double rhoCut4=rhoCut/4.;
+      const double rhoM = 0.77;
+      const double rhoCut = 0.124;
+      const double rhoCut2 = rhoCut/2.;
+      const double rhoCut4 = rhoCut/4.;
 
       histosTH1F["hmALLpiKen0"]->Fill(m11);
       histosTH1F["hmALLpiKen0"]->Fill(m12);
 
-      if(fabs(m11-rhoM)<rhoCut) histosTH1F["hmrhootherKen0"]->Fill(m22);
-      if(fabs(m12-rhoM)<rhoCut) histosTH1F["hmrhootherKen0"]->Fill(m21);
+      histosTH2F["hmALLpiKen0_2D"]->Fill(m11, m22);
+      histosTH2F["hmALLpiKen0_2D"]->Fill(m12, m21);
 
-      int nOK2mass=0;
-      if(fabs(m11-rhoM)<rhoCut2 && fabs(m22-rhoM)<rhoCut2) nOK2mass++;
-      if(fabs(m12-rhoM)<rhoCut2 && fabs(m21-rhoM)<rhoCut2) nOK2mass++;
+      if (fabs(m11-rhoM) < rhoCut) histosTH1F["hmrhootherKen0"]->Fill(m22);
+      if (fabs(m12-rhoM) < rhoCut) histosTH1F["hmrhootherKen0"]->Fill(m21);
 
-      if(nOK2mass>0)
+      int nOK2mass = 0;
+      if (fabs(m11-rhoM) < rhoCut2 && fabs(m22-rhoM) < rhoCut2) nOK2mass++;
+      if (fabs(m12-rhoM) < rhoCut2 && fabs(m21-rhoM) < rhoCut2) nOK2mass++;
+
+      int nOK4mass=0;
+      if(fabs(m11-rhoM) < rhoCut4 && fabs(m22-rhoM) < rhoCut4) nOK4mass++;
+      if(fabs(m12-rhoM) < rhoCut4 && fabs(m21-rhoM) < rhoCut4) nOK4mass++;
+
+      if (nOK2mass>0)
       {
         histosTH1F["hm4SIG1mass"]->Fill(mrec4);
 
         histosTH1F["hnPIcurvesSIG1"]->Fill(nPIcurves);
-        if(nPIcurves==4) histosTH1F["hm4SIG1mass4curves"]->Fill(mrec4);
-        if(nPIcurves>=3) histosTH1F["hm4SIG1mass34curves"]->Fill(mrec4);
+        if (nPIcurves == 4) histosTH1F["hm4SIG1mass4curves"]->Fill(mrec4);
+        if (nPIcurves >= 3) histosTH1F["hm4SIG1mass34curves"]->Fill(mrec4);
+        if (nPIcurves >= 2) histosTH1F["hm4SIG1mass234curves"]->Fill(mrec4);
+        if (nPIcurves >= 1) histosTH1F["hm4SIG1mass1234curves"]->Fill(mrec4);
       }
-
-      int nOK4mass=0;
-      if(fabs(m11-rhoM)<rhoCut4 && fabs(m22-rhoM)<rhoCut4) nOK4mass++;
-      if(fabs(m12-rhoM)<rhoCut4 && fabs(m21-rhoM)<rhoCut4) nOK4mass++;
 
       if (nOK4mass>0)
       {
         histosTH1F["hm4SIG2mass"]->Fill(mrec4);
 
         histosTH1F["hnPIcurvesSIG2"]->Fill(nPIcurves);
-        if(nPIcurves==4) histosTH1F["hm4SIG2mass4curves"]->Fill(mrec4);
-        if(nPIcurves>=3) histosTH1F["hm4SIG2mass34curves"]->Fill(mrec4);
+        if (nPIcurves == 4) histosTH1F["hm4SIG2mass4curves"]->Fill(mrec4);
+        if (nPIcurves >= 3) histosTH1F["hm4SIG2mass34curves"]->Fill(mrec4);
+        if (nPIcurves >= 2) histosTH1F["hm4SIG2mass234curves"]->Fill(mrec4);
+        if (nPIcurves >= 1) histosTH1F["hm4SIG2mass1234curves"]->Fill(mrec4);
       }
 
       //------------------------
       // phi-phi
       // kaons
 
-      TLorentzVector k4m11 = k4pos1 + k4neg1;
-      TLorentzVector k4m22 = k4pos2 + k4neg2;
+      const TLorentzVector k4m11 = k4pos1 + k4neg1;
+      const TLorentzVector k4m22 = k4pos2 + k4neg2;
 
-      TLorentzVector k4m12 = k4pos1 + k4neg2;
-      TLorentzVector k4m21 = k4pos2 + k4neg1;
+      const TLorentzVector k4m12 = k4pos1 + k4neg2;
+      const TLorentzVector k4m21 = k4pos2 + k4neg1;
 
       const double m11k = k4m11.M();
       const double m22k = k4m22.M();
@@ -1241,9 +1264,15 @@ void PromptAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
         histosTH1F["hnKcurves"]->Fill(nKcurves);
         if (nKcurves == 4) histosTH1F["hm4PHImass4curves"]->Fill(mrec4k);
         if (nKcurves == 3) histosTH1F["hm4PHImass3curves"]->Fill(mrec4k);
-        if (nKcurves >= 3) histosTH1F["hm4PHImass34curves"]->Fill(mrec4k);
 
-        if (nKcurves >= 3 || twoKaonsOfTheSameSign) histosTH1F["hm4PHImass34curves2S"]->Fill(mrec4k);
+        if (nKcurves >= 3) histosTH1F["hm4PHImass34curves"]->Fill(mrec4k);
+        if (nKcurves >= 2) histosTH1F["hm4PHImass234curves"]->Fill(mrec4k);
+        if (nKcurves >= 1) histosTH1F["hm4PHImass1234curves"]->Fill(mrec4k);
+
+        if (nKcurves >= 3 || twoKaonsOfTheSameSign) histosTH1F["hm4PHImass34curves2SS"]->Fill(mrec4k);
+
+        if (nPIcurves == 0) histosTH1F["hm4PHImassPiVeto"]->Fill(mrec4k);
+        if (nKcurves >= 1 && nPIcurves == 0) histosTH1F["hm4PHImass1234curvesPiVeto"]->Fill(mrec4k);
       }
 
       if (nOKPhiCutStrict > 0)
@@ -1252,12 +1281,21 @@ void PromptAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 
         histosTH1F["hnKcurves_PhiCutStrict"]->Fill(nKcurves);
 
+        if (nKcurves == 4) histosTH1F["hm4PHImass4curves_PhiCutStrict"]->Fill(mrec4k);
+        if (nKcurves == 3) histosTH1F["hm4PHImass3curves_PhiCutStrict"]->Fill(mrec4k);
+
         if (nKcurves >= 3) histosTH1F["hm4PHImass34curves_PhiCutStrict"]->Fill(mrec4k);
-        if (nKcurves >= 3 || twoKaonsOfTheSameSign) histosTH1F["hm4PHImass34curves2S_PhiCutStrict"]->Fill(mrec4k);
+        if (nKcurves >= 2) histosTH1F["hm4PHImass234curves_PhiCutStrict"]->Fill(mrec4k);
+        if (nKcurves >= 1) histosTH1F["hm4PHImass1234curves_PhiCutStrict"]->Fill(mrec4k);
+
+        if (nKcurves >= 3 || twoKaonsOfTheSameSign) histosTH1F["hm4PHImass34curves2SS_PhiCutStrict"]->Fill(mrec4k);
+
+        if (nPIcurves == 0) histosTH1F["hm4PHImassPiVeto_PhiCutStrict"]->Fill(mrec4k);
+        if (nKcurves >= 1 && nPIcurves == 0) histosTH1F["hm4PHImass1234curvesPiVeto_PhiCutStrict"]->Fill(mrec4k);
       }
 
       //------------------------------------------
-      // K*K*
+      // K*-K*
 
       double kstarCut=0.042;
 
