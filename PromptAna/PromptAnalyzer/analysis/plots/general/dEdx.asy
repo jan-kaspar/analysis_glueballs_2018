@@ -1,11 +1,11 @@
 import root;
 import pad_layout;
 
-string topDir = "../";
+string topDir = "../../";
 
 string datasets[];
 datasets.push("TOTEM2");
-//datasets.push("TOTEM4");
+datasets.push("TOTEM4");
 
 TH2_x_min = 0;
 TH2_x_max = 2;
@@ -70,10 +70,10 @@ for (int dsi : datasets.keys)
 	//hist.vExec("Rebin2D", 2, 2);
 	draw(hist);
 
-	draw(graph(KaonMin, 0.1, 2.), black);
-	draw(graph(KaonMax, 0.1, 2.), black);
+	draw(graph(KaonMin, 0.05, 2.), black);
+	draw(graph(KaonMax, 0.05, 2.), black);
 
-	draw(graph(PionMax, 0.1, 2.), magenta+dashed);
+	draw(graph(PionMax, 0.05, 2.), magenta+dashed);
 
 	limits((0, 0), (2, 15), Crop);
 
@@ -81,3 +81,5 @@ for (int dsi : datasets.keys)
 	AddToLegend("Pion", magenta+dashed);
 	AttachLegend(histName);
 }
+
+GShipout("dEdx", vSkip=0mm);

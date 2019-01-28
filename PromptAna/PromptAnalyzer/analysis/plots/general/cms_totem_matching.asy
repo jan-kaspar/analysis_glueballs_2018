@@ -1,7 +1,7 @@
 import root;
 import pad_layout;
 
-string topDir = "../";
+string topDir = "../../";
 
 string datasets[];
 
@@ -25,8 +25,6 @@ datasets.push("TOTEM4");
 //datasets.push("TOTEM4/319300");
 //datasets.push("TOTEM4/319311");
 
-TH2_palette = Gradient(white, blue, heavygreen, yellow, red);
-
 //----------------------------------------------------------------------------------------------------
 
 for (int dsi : datasets.keys)
@@ -37,19 +35,17 @@ for (int dsi : datasets.keys)
 
 	string f = topDir + datasets[dsi] + "/merged.root";
 
-	string histName = "h2DIMdpx4trk";
-	NewPad("$p_x^{\rm CMS}\ung{GeV}$", "$p_x^{\rm TOTEM}\ung{GeV}$", axesAbove=true);
-	RootObject hist = RootGetObject(f, histName);
-	hist.vExec("Rebin2D", 2, 2);
-	draw(hist);
-	limits((-2, -2), (+2, +2), Crop);
+	string histName = "hdpx4trk";
+	NewPad("$p_x^{\rm CMS} + p_x^{\rm TOTEM}\ung{GeV}$");
+	draw(RootGetObject(f, histName), "vl", red);
 	AttachLegend(histName);
+	yaxis(XEquals(-0.15, false), heavygreen);
+	yaxis(XEquals(+0.15, false), heavygreen);
 
-	string histName = "h2DIMdpy4trk";
-	NewPad("$p_y^{\rm CMS}\ung{GeV}$", "$p_y^{\rm TOTEM}\ung{GeV}$", axesAbove=true);
-	RootObject hist = RootGetObject(f, histName);
-	hist.vExec("Rebin2D", 2, 2);
-	draw(hist);
-	limits((-2, -2), (+2, +2), Crop);
+	string histName = "hdpy4trk";
+	NewPad("$p_y^{\rm CMS} + p_y^{\rm TOTEM}\ung{GeV}$");
+	draw(RootGetObject(f, histName), "vl", red);
 	AttachLegend(histName);
+	yaxis(XEquals(-0.06, false), heavygreen);
+	yaxis(XEquals(+0.06, false), heavygreen);
 }
