@@ -1,0 +1,182 @@
+\input slides.tex
+%\input utf8-t1
+
+%----------------------------------------------------------------------------------------------------
+
+\def\author{J.~Kaspar}
+\def\caption{Glueballs 2018}
+\def\date{28 Jan 2019}
+
+
+
+\newpage %-------------------------------------------------------------------------------------------
+\title{General notes}
+
+\> analysis code
+\>> original code by Robert Ciesielski
+\>> updated stored in https://github.com/jan-kaspar/analysis\_glueballs\_2018
+
+\> data source
+\>> PromptReco-v2, AOD
+\>> runs included: 319176, 319256, 319262, 319263, 319265, 319268, 319300, 319311
+
+\> triggers
+\>> TOTEM2: diagonal configuration with elastic cut
+\>> TOTEM4: anti-diagonal configurations (top-top and bottom-bottom)
+
+\> upcoming slides: about $75\un{\%}$ of ntuples processed
+\>> typical failure: input AOD file not available via XROOT/AAA
+
+
+\newpage %-------------------------------------------------------------------------------------------
+\title{Standard event selection}
+
+\> general
+\>> single vertex
+\>> single (exclusive) RP configuration (left/right and top/bottom)
+\>> anti-elastic cut by scattering angle comparison (see slide 3)
+
+\> 4-track sample
+\>> 4 tracks
+\>> charge balance
+\>> 4 tracks associated with the single vertex
+\>> CMS-TOTEM RP matching by momentum comparison (see slides 4 and 5)
+
+
+\newpage %-------------------------------------------------------------------------------------------
+\title{Anti-elastic cut}
+
+\> scattering angles reconstructed in elastic-like approximation
+
+\> cuts applied: single vertex, single RP configuration
+
+\centerline{\fig[14cm]{../plots/general/elastic_cut.pdf}}
+
+\>> excluded region: between vertical green lines
+
+
+\newpage %-------------------------------------------------------------------------------------------
+\title{CMS-TOTEM RP matching}
+
+\> comparison of transverse momenta from CMS and TOTEM RPs
+
+\> cuts applied: single vertex, single RP configuration, anti-elastic cut, 4 tracks, 4 tracks associated with the vertex, charge balance
+
+\centerline{\fig[12cm]{../plots/general/cms_totem_matching_2D.pdf}}
+
+
+\newpage %-------------------------------------------------------------------------------------------
+\title{CMS-TOTEM RP matching}
+
+\> as on previous slide, but plotting CMS-TOTEM difference
+
+\centerline{\fig[12cm]{../plots/general/cms_totem_matching.pdf}}
+
+\>> selected region: between vertical green lines
+
+
+\newpage %-------------------------------------------------------------------------------------------
+\title{PID based on $\d E/\d x$}
+
+\> ``standard cuts`` in 4-track sample (slide 2)
+
+\centerline{\fig[,8.5cm]{../plots/general/dEdx.pdf}}
+
+\>> kaon selection: between the black curves
+\>> pion selection: below the dashed magenta curve
+
+
+\newpage %-------------------------------------------------------------------------------------------
+\title{Phi-Phi}
+
+\> each track: kaon mass hypothesis
+
+\> cuts
+\>> ``standard event selection'' (see slide 2)
+\>> mass of each $K^+ K^-$ pair compatible with $\ph$
+\>>> both kaon combinations considered
+\>>> central value $m(\ph) = 1.02\un{GeV}$, ``window'' width $\si = 0.02\un{GeV}$
+\>>> different tolerances tried: ``$\si$'', ``$\si/2$''
+\>> given number of tracks identified as kaons with $\d E/\d x$ (see slides 9 and 11)
+
+
+\newpage %-------------------------------------------------------------------------------------------
+\ctitle{Phi-Phi}{Kaon-pair mass distributions, $\si$ cut}
+
+\> plots of invariant masses of kaon pairs
+\>> kaons combined such that total charge is zero
+\>> $m_{ij}$: combination of $i$-th positive and $j$-th negative kaon
+
+\centerline{\fig[15cm]{../plots/phi-phi/mass_pair_dist.pdf}}
+
+\>> selection regions: black square of green axes
+
+
+
+\newpage %-------------------------------------------------------------------------------------------
+\ctitle{Phi-Phi}{4-kaon mass distributions, $\si$ cut}
+
+\centerline{\fig[15cm]{../plots/phi-phi/mass_dist.pdf}}
+
+
+
+\newpage %-------------------------------------------------------------------------------------------
+\ctitle{Phi-Phi}{Kaon-pair mass distributions, $\si/2$ cut}
+
+\> plots of invariant masses of kaon pairs
+\>> kaons combined such that total charge is zero
+\>> $m_{ij}$: combination of $i$-th positive and $j$-th negative kaon
+
+\centerline{\fig[15cm]{../plots/phi-phi/mass_pair_dist_PhiCutStrict.pdf}}
+
+\>> selection regions: black square of green axes
+
+
+
+\newpage %-------------------------------------------------------------------------------------------
+\ctitle{Phi-Phi}{4-kaon mass distributions, $\si/2$ cut}
+
+\centerline{\fig[15cm]{../plots/phi-phi/mass_dist_PhiCutStrict.pdf}}
+
+
+
+\newpage %-------------------------------------------------------------------------------------------
+\title{Rho-Rho}
+
+\> each track: pion mass hypothesis
+
+\> cuts
+\>> ``standard event selection'' (see slide 2)
+\>> mass of each $\pi^+ \pi^-$ pair compatible with $\rh$
+\>>> both pion combinations considered
+\>>> central value $m(\rh) = 0.77\un{GeV}$, ``window'' width $\si = 0.124\un{GeV}$
+\>>> different tolerances tried: ``$\si$'', ``$\si/2$'' and ``$\si/4$''
+\>> given number of tracks identified as pions with $\d E/\d x$ (see slides 14 and 15)
+
+
+\newpage %-------------------------------------------------------------------------------------------
+\ctitle{Rho-Rho}{Pion-pair mass distributions, $\si$ cut}
+
+\> plots of invariant masses of pion pairs
+\>> pions combined such that total charge is zero
+\>> $m_{ij}$: combination of $i$-th positive and $j$-th negative pion
+
+\centerline{\fig[15cm]{../plots/rho-rho/mass_pair_dist_cut1.pdf}}
+
+\>> selection regions: black square of green axes
+
+
+\newpage %-------------------------------------------------------------------------------------------
+\ctitle{Rho-Rho}{4-pion mass distributions, $\si/2$ cut}
+
+\centerline{\fig[16cm]{../plots/rho-rho/mass_dist_cut2.pdf}}
+
+
+\newpage %-------------------------------------------------------------------------------------------
+\ctitle{Rho-Rho}{4-pion mass distributions, $\si/4$ cut}
+
+\centerline{\fig[16cm]{../plots/rho-rho/mass_dist_cut4.pdf}}
+
+\vfil
+\eject
+\bye
