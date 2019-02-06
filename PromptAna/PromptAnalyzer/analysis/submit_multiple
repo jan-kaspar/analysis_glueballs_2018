@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 ./submit "TOTEM2/319176" "input/TOTEM2_319176.txt"
 ./submit "TOTEM2/319256" "input/TOTEM2_319256.txt"
 ./submit "TOTEM2/319262" "input/TOTEM2_319262.txt"
@@ -9,7 +8,7 @@
 ./submit "TOTEM2/319268" "input/TOTEM2_319268.txt"
 ./submit "TOTEM2/319300" "input/TOTEM2_319300.txt"
 ./submit "TOTEM2/319311" "input/TOTEM2_319311.txt"
-                                                     
+
 ./submit "TOTEM4/319176" "input/TOTEM4_319176.txt"
 ./submit "TOTEM4/319256" "input/TOTEM4_319256.txt"
 ./submit "TOTEM4/319262" "input/TOTEM4_319262.txt"
