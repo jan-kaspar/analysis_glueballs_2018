@@ -110,8 +110,8 @@ class PromptAnalyzer : public edm::one::EDFilter<>
     edm::EDGetTokenT<vector<CTPPSLocalTrackLite> > RPtrkToken_;
     edm::EDGetTokenT<reco::VertexCollection> vtxToken_;
     //edm::EDGetTokenT<edm::TriggerResults>  trigToken_;
-    edm::EDGetTokenT<reco::PFCandidateCollection> pfToken_;
-    edm::EDGetTokenT<reco::MuonCollection> muToken_;
+    //edm::EDGetTokenT<reco::PFCandidateCollection> pfToken_;
+    //edm::EDGetTokenT<reco::MuonCollection> muToken_;
     //edm::EDGetTokenT<edmNew::DetSetVector<SiPixelCluster> > clusterToken_;
 
     map<string, TH1F*> histosTH1F;
@@ -129,8 +129,8 @@ PromptAnalyzer::PromptAnalyzer(const edm::ParameterSet& iConfig) :
   dedxpixelToken_(consumes<reco::DeDxHitInfoAss>(iConfig.getParameter<edm::InputTag>("dedxpixels"))),
   RPtrkToken_(consumes<vector<CTPPSLocalTrackLite> >(iConfig.getParameter<edm::InputTag>("RPtracks"))),
   vtxToken_(consumes<reco::VertexCollection>(iConfig.getParameter<edm::InputTag>("vertices"))),
-  pfToken_(consumes<reco::PFCandidateCollection>(iConfig.getParameter<edm::InputTag>("pflows"))),
-  muToken_(consumes<reco::MuonCollection>(iConfig.getParameter<edm::InputTag>("muons"))),
+  //pfToken_(consumes<reco::PFCandidateCollection>(iConfig.getParameter<edm::InputTag>("pflows"))),
+  //muToken_(consumes<reco::MuonCollection>(iConfig.getParameter<edm::InputTag>("muons"))),
 
   outputFileName(iConfig.getParameter<std::string>("outputFileName"))
 {
@@ -486,19 +486,19 @@ bool PromptAnalyzer::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
   edm::Handle<reco::DeDxHitInfoAss> dedxpixels;
   edm::Handle<vector<CTPPSLocalTrackLite> > RPtracks;
   edm::Handle<VertexCollection> vertices;
-  edm::Handle<PFCandidateCollection> pfs;
-  edm::Handle<MuonCollection> muons;
+  //edm::Handle<PFCandidateCollection> pfs;
+  //edm::Handle<MuonCollection> muons;
   edm::Handle<reco::DeDxHitInfoAss> dedxCollH;
 
-  iEvent.getByToken(trkToken_,tracks);
-  iEvent.getByToken(dedxToken_,dedxs);
-  iEvent.getByToken(dedxPIXToken_,dedxPIXs);
-  iEvent.getByToken(dedxpixelToken_,dedxpixels);
-  iEvent.getByToken(RPtrkToken_,RPtracks);
-  iEvent.getByToken(vtxToken_,vertices);
-  iEvent.getByToken(pfToken_,pfs);
-  iEvent.getByToken(muToken_,muons);
-  iEvent.getByLabel("dedxHitInfo",dedxCollH);
+  iEvent.getByToken(trkToken_, tracks);
+  iEvent.getByToken(dedxToken_, dedxs);
+  iEvent.getByToken(dedxPIXToken_, dedxPIXs);
+  iEvent.getByToken(dedxpixelToken_, dedxpixels);
+  iEvent.getByToken(RPtrkToken_, RPtracks);
+  iEvent.getByToken(vtxToken_, vertices);
+  //iEvent.getByToken(pfToken_, pfs);
+  //iEvent.getByToken(muToken_, muons);
+  iEvent.getByLabel("dedxHitInfo", dedxCollH);
 
   if (!dedxpixels.isValid())
     printf("Invalid dedxCollH\n");
@@ -511,9 +511,9 @@ bool PromptAnalyzer::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
   bool fiducialRegion = false;
 
-  double etaCut= 2.5;
+  double etaCut = 2.5;
 
-  int totcharge=0;
+  int totcharge = 0;
 
   // tracks in 2-track-events (npixelhits>0)
   TLorentzVector pi1(0.,0.,0.,0.);
@@ -942,6 +942,7 @@ bool PromptAnalyzer::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
   //--------------------------------------------------------------------------------
   // process HF data
 
+  /*
   int nHFhad=0;
   int nHFemc=0;
 
@@ -986,7 +987,6 @@ bool PromptAnalyzer::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
       if(PFene > thresHFemc && PFeta>0) histosTH2F["heHF_Pemc_2DIM"]->Fill(PFeta,PFene);
 
     }
-
   }
 
   histosTH1F["hnHF"]->Fill(nHFhad+nHFemc);
@@ -994,12 +994,13 @@ bool PromptAnalyzer::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
   histosTH1F["hnHFemc"]->Fill(nHFemc);
 
   //if(nHFhad+nHFemc > 1 ) return;
+  */
 
   //--------------------------------------------------------------------------------
   // CMS-TOTEM matching
 
-  double TOTEMpy= 6500.*(ThyL+ThyR);
-  double TOTEMpx=-6500.*(ThxL+ThxR);
+  double TOTEMpy =  6500.*(ThyL+ThyR);
+  double TOTEMpx = -6500.*(ThxL+ThxR);
   double TOTEMphiL = TMath::ATan2(ThyL,ThxL);
   double TOTEMphiR = TMath::ATan2(ThyR,ThxR);
 
