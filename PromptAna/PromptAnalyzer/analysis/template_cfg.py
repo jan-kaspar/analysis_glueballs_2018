@@ -25,7 +25,7 @@ process.source = cms.Source("PoolSource",
   fileNames = cms.untracked.vstring($INPUT)
 )
 
-process.analyzer = cms.EDAnalyzer("PromptAnalyzer",
+process.analyzer = cms.EDFilter("PromptAnalyzer",
   tracks = cms.InputTag('generalTracks'),
   dedxs = cms.InputTag('dedxHarmonic2'),
   dedxPIXs = cms.InputTag('dedxPixelHarmonic2'),
