@@ -114,8 +114,10 @@ class PromptAnalyzer : public edm::one::EDFilter<>
     edm::EDGetTokenT<reco::MuonCollection> muToken_;
     //edm::EDGetTokenT<edmNew::DetSetVector<SiPixelCluster> > clusterToken_;
 
-  map<string, TH1F*> histosTH1F;
-  map<string, TH2F*> histosTH2F;
+    map<string, TH1F*> histosTH1F;
+    map<string, TH2F*> histosTH2F;
+
+    std::string outputFileName;
 };
 
 //----------------------------------------------------------------------------------------------------
@@ -128,7 +130,9 @@ PromptAnalyzer::PromptAnalyzer(const edm::ParameterSet& iConfig) :
   RPtrkToken_(consumes<vector<CTPPSLocalTrackLite> >(iConfig.getParameter<edm::InputTag>("RPtracks"))),
   vtxToken_(consumes<reco::VertexCollection>(iConfig.getParameter<edm::InputTag>("vertices"))),
   pfToken_(consumes<reco::PFCandidateCollection>(iConfig.getParameter<edm::InputTag>("pflows"))),
-  muToken_(consumes<reco::MuonCollection>(iConfig.getParameter<edm::InputTag>("muons")))
+  muToken_(consumes<reco::MuonCollection>(iConfig.getParameter<edm::InputTag>("muons"))),
+
+  outputFileName(iConfig.getParameter<std::string>("outputFileName"))
 {
 }
 
@@ -398,7 +402,10 @@ void PromptAnalyzer::beginJob()
 
 void PromptAnalyzer::endJob()
 {
-  TFile* output = new TFile("output.root", "RECREATE");
+  if (outputFileName == "")
+    return;
+
+  TFile* output = new TFile(outputFileName.c_str(), "RECREATE");
   output->cd();
 
   for (map<string,TH1F*>::iterator it_histo = histosTH1F.begin();it_histo != histosTH1F.end(); ++it_histo)

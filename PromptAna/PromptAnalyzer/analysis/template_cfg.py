@@ -34,7 +34,9 @@ process.analyzer = cms.EDAnalyzer("PromptAnalyzer",
   vertices = cms.InputTag('offlinePrimaryVertices'),
   triggers = cms.InputTag('TriggerResults','','HLT'),
   pflows = cms.InputTag('particleFlow'),
-  muons = cms.InputTag('muons')
+  muons = cms.InputTag('muons'),
+
+  outputFileName = cms.string("output.root")
 )
 
 process.p = cms.Path(process.analyzer)
