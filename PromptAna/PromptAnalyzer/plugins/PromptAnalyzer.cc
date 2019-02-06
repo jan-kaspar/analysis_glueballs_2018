@@ -300,6 +300,9 @@ void PromptAnalyzer::beginJob()
 
   histosTH1F["hm4PHImass34curves2SS_PhiCutStrict"] = new TH1F("hm4PHImass34curves2SS_PhiCutStrict", "M_{4K}, #varphi#varphi + >=3K curves or 2K same sign",massbins4,0.,10.);
 
+  histosTH1F["h_m_4K_PEAK"] = new TH1F("h_m_4K_PEAK", "M_{4K}", massbins4, 0., 10.);
+  histosTH1F["h_m_4pi_PEAK"] = new TH1F("h_pi_4pi_PEAK", "M_{4#pi}", massbins4, 0., 10.);
+
   //-----
 
   histosTH1F["hm2BKG"] = new TH1F("hm2BKG", "TOTEM2, M_{#pi^{+}#pi^{-}} (GeV)", massbins4,0.,10.);
@@ -326,6 +329,7 @@ void PromptAnalyzer::beginJob()
   histosTH1F["hmALLpiKen0"] = new TH1F("hmALLpiKen0","M_{#pi#pi}",massbins,0,5.);
 
   histosTH2F["hmALLpiKen0_2D"] = new TH2F("hmALLpiKen0_2D","M_{22 or 21}(#pi#pi) vs. M_{11 or 12}(#pi#pi)", 80, 0.4, 1.2, 80, 0.4, 1.2);
+  histosTH2F["hmALLpiKen0_2D_PEAK"] = new TH2F("hmALLpiKen0_2D_PEAK","M_{22 or 21}(#pi#pi) vs. M_{11 or 12}(#pi#pi)", 80, 0.4, 1.2, 80, 0.4, 1.2);
 
   histosTH1F["hmrhootherKen0"] = new TH1F("hmrhootherKen0","M_{#pi#pi} if #rho",massbins,0,5.);
 
@@ -410,6 +414,10 @@ void PromptAnalyzer::endJob()
 
 bool PromptAnalyzer::isKaonCurve(double p, double dEdx)
 {
+  // TODO
+  //if (p > 0.5)
+  //  return false;
+
   bool isKaon = false;
 
   // 3sigma curves based on 2018 data with pbins=2
@@ -430,6 +438,10 @@ bool PromptAnalyzer::isKaonCurve(double p, double dEdx)
 
 bool PromptAnalyzer::isPionCurve(double p, double dEdx)
 {
+  // TODO
+  //if (p > 0.5)
+  //  return false;
+
   bool ispion = false;
 
   // 3sigma curves based on 2018 data with pbins=2
@@ -1293,6 +1305,17 @@ void PromptAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
         if (nPIcurves == 0) histosTH1F["hm4PHImassPiVeto_PhiCutStrict"]->Fill(mrec4k);
         if (nKcurves >= 1 && nPIcurves == 0) histosTH1F["hm4PHImass1234curvesPiVeto_PhiCutStrict"]->Fill(mrec4k);
       }
+
+      // begin: test code
+      if (nOKPhiCut > 0 && mrec4k > 2.210 && mrec4k < 2.225)
+      {
+          histosTH1F["h_m_4K_PEAK"]->Fill(mrec4k);
+          histosTH1F["h_m_4pi_PEAK"]->Fill(mrec4);
+
+          histosTH2F["hmALLpiKen0_2D_PEAK"]->Fill(m11, m22);
+          histosTH2F["hmALLpiKen0_2D_PEAK"]->Fill(m12, m21);
+      }
+      // end: test code
 
       //------------------------------------------
       // K*-K*
