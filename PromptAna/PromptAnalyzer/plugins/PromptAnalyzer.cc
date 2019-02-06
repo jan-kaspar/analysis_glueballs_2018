@@ -14,7 +14,7 @@
 
 // user include files
 #include "FWCore/Framework/interface/Frameworkfwd.h"
-#include "FWCore/Framework/interface/one/EDAnalyzer.h"
+#include "FWCore/Framework/interface/one/EDFilter.h"
 
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Framework/interface/EventSetup.h"
@@ -87,7 +87,7 @@ using namespace std;
 
 //----------------------------------------------------------------------------------------------------
 
-class PromptAnalyzer : public edm::one::EDAnalyzer<>
+class PromptAnalyzer : public edm::one::EDFilter<>
 {
   public:
     explicit PromptAnalyzer(const edm::ParameterSet&);
@@ -97,7 +97,7 @@ class PromptAnalyzer : public edm::one::EDAnalyzer<>
 
   private:
     virtual void beginJob() override;
-    virtual void analyze(const edm::Event&, const edm::EventSetup&) override;
+    virtual bool filter(edm::Event&, const edm::EventSetup&) override;
     virtual void endJob() override;
 
     bool isKaonCurve(double p, double dEdx);
@@ -467,8 +467,11 @@ void PromptAnalyzer::fillDescriptions(edm::ConfigurationDescriptions& descriptio
 
 //----------------------------------------------------------------------------------------------------
 
-void PromptAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
+bool PromptAnalyzer::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
+  // defaults
+  bool returnStatus = false;
+
   // get input
   edm::Handle<TrackCollection> tracks;
   edm::Handle<edm::ValueMap<reco::DeDxData>> dedxs;
@@ -769,7 +772,7 @@ void PromptAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
   //  fiducialRegion = fiducialRegion && nvtx==1;
 
   if (nvtx != 1)
-    return;
+    return returnStatus;
 
   histosTH1F["hvtxx"]->Fill(xvtx);
   histosTH1F["hvtxy"]->Fill(yvtx);
@@ -859,7 +862,7 @@ void PromptAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
   histosTH1F["hnconf"]->Fill(nconf);
 
   if (nconf != 1)
-    return;
+    return returnStatus;
 
   // topology: 1 - TB, 2 - BT, 3 - TT, 4 - BB
   int tb = -1;
@@ -924,7 +927,7 @@ void PromptAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
     isElastic=true;
 
   if (isElastic)
-    return;
+    return returnStatus;
 
   histosTH1F["hthxEla2"]->Fill(ThxL+ThxR);
   histosTH1F["hthyEla2"]->Fill(ThyL+ThyR);
@@ -1120,6 +1123,8 @@ void PromptAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 
     if (allCuts4)
     {
+      returnStatus = true;
+
       int nPIcurves=0;
       int nKcurves=0, nKcurvesPos=0, nKcurvesNeg=0;
 
@@ -1423,6 +1428,8 @@ void PromptAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       histosTH1F["heta4BKG"]->Fill(pi4neg2.Eta());
     }
   }
+
+  return returnStatus;
 }
 
 //----------------------------------------------------------------------------------------------------
