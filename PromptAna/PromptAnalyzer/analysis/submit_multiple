@@ -1,19 +1,31 @@
 #!/bin/bash
 
-./submit "TOTEM2/319176" "input/TOTEM2_319176.txt"
-./submit "TOTEM2/319256" "input/TOTEM2_319256.txt"
-./submit "TOTEM2/319262" "input/TOTEM2_319262.txt"
-./submit "TOTEM2/319263" "input/TOTEM2_319263.txt"
-./submit "TOTEM2/319265" "input/TOTEM2_319265.txt"
-./submit "TOTEM2/319268" "input/TOTEM2_319268.txt"
-./submit "TOTEM2/319300" "input/TOTEM2_319300.txt"
-./submit "TOTEM2/319311" "input/TOTEM2_319311.txt"
+#input_dir="input/AOD"
+input_dir="input/reduced"
 
-./submit "TOTEM4/319176" "input/TOTEM4_319176.txt"
-./submit "TOTEM4/319256" "input/TOTEM4_319256.txt"
-./submit "TOTEM4/319262" "input/TOTEM4_319262.txt"
-./submit "TOTEM4/319263" "input/TOTEM4_319263.txt"
-./submit "TOTEM4/319265" "input/TOTEM4_319265.txt"
-./submit "TOTEM4/319268" "input/TOTEM4_319268.txt"
-./submit "TOTEM4/319300" "input/TOTEM4_319300.txt"
-./submit "TOTEM4/319311" "input/TOTEM4_319311.txt"
+output_dir="output_test"
+
+streams=(
+	"TOTEM2"
+	"TOTEM4"
+)
+
+runs=(
+	"319176"
+	"319256"
+	"319262"
+	"319263"
+	"319265"
+	"319268"
+	"319300"
+	"319311"
+)
+
+for stream in ${streams[*]}
+do
+	for run in ${runs[*]}
+	do
+		echo "$stream $run"
+		./submit "$stream/$run" "$input_dir/${stream}_${run}" "$output_dir/${stream}/${run}"
+	done
+done

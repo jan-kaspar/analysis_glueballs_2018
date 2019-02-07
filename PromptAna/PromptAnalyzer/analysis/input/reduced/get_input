@@ -1,0 +1,36 @@
+#!/bin/bash
+
+#----------------------------------------------------------------------------------------------------
+
+function GetOne()
+{
+	local stream="$1"
+	local run="$2"
+
+	eos ls "$eos_dir" | grep "_$stream.root" | grep "run_$run" | while read f
+	do
+		echo "\"root://eostotem.cern.ch/$eos_dir/$f\","
+	done > "${stream}_${run}"
+}
+
+#----------------------------------------------------------------------------------------------------
+
+eos_dir="/eos/totem/data/ctpps/reconstruction/2018/90m/AOD_skim/version1"
+
+GetOne "TOTEM2" "319176"
+GetOne "TOTEM2" "319256"
+GetOne "TOTEM2" "319262"
+GetOne "TOTEM2" "319263"
+GetOne "TOTEM2" "319265"
+GetOne "TOTEM2" "319268"
+GetOne "TOTEM2" "319300"
+GetOne "TOTEM2" "319311"
+
+GetOne "TOTEM4" "319176"
+GetOne "TOTEM4" "319256"
+GetOne "TOTEM4" "319262"
+GetOne "TOTEM4" "319263"
+GetOne "TOTEM4" "319265"
+GetOne "TOTEM4" "319268"
+GetOne "TOTEM4" "319300"
+GetOne "TOTEM4" "319311"

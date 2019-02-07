@@ -4,7 +4,7 @@
 
 function PrintUsage()
 {
-	echo "USAGE: submit [job name] [input file]"
+	echo "USAGE: submit [job name] [input file] [output dir]"
 }
 
 #----------------------------------------------------------------------------------------------------
@@ -28,7 +28,7 @@ function MakeCfg()
 	cfg_file="$dir/cfg.py"
 
 	cat "template_cfg.py" | sed "\
-			s|\$INPUT|$input_file|;\
+			s|\$INPUT|$buffer|;\
 		" > "$cfg_file"
 }
 
@@ -36,43 +36,31 @@ function MakeCfg()
 
 job_name="$1"
 input_file="$2"
+output_dir="$3"
+files_per_block="2" # TODO
 
 cwd=`pwd -P`
 
-if [ -z "$job_name" -o -z "$input_file" ]
+if [ -z "$job_name" -o ! -f "$input_file" -o -z "$output_dir" ]
 then
 	PrintUsage
 	exit 1
 fi
 
-mkdir -p "$job_name"
+mkdir -p "$output_dir"
 
-sub_script="$job_name/condor.sub"
+sub_script="$output_dir/condor.sub"
 
-base_dir="$cwd/$job_name"
+base_dir="$cwd/$output_dir"
 
-(
-	echo "executable = $base_dir/\$(dir)/job"
-	echo "arguments = \$(ClusterId) \$(ProcId) \\\"\$(dir)\\\""
-	echo "output = $base_dir/\$(dir)/out"
-	echo "error = $base_dir/\$(dir)/err"
-	echo "log = $base_dir/condor.log"
+#----------------------------------------------------------------------------------------------------
 
-	#echo "+JobFlavour = \"espresso\"" # 20 minutes
-	#echo "+JobFlavour = \"microcentury\"" # 1 hour
-	echo "+MaxRuntime = 7200" # in s
+function FlushBlock()
+{
+	#TODO
 
-	echo "+JobBatchName = \"$job_name\""
-
-	echo "requirements = (OpSysAndVer =?= \"SLCern6\")"
-
-) > "$sub_script"
-
-idx=0
-for input_file in `cat $input_file`
-do
-	idxDir="idx$idx"
-	dir="$job_name/$idxDir"
+	idxDir="idx$block_idx"
+	dir="$output_dir/$idxDir"
 	echo "* $dir"
 
 	# make and clean directory
@@ -97,8 +85,49 @@ do
 		echo "queue"
 	) >> "$sub_script"
 
-	let idx=$idx+1
+	buffer=""
+	buffer_size=0
+	let block_idx=$block_idx+1
+}
+
+#----------------------------------------------------------------------------------------------------
+
+(
+	echo "executable = $base_dir/\$(dir)/job"
+	echo "arguments = \$(ClusterId) \$(ProcId) \\\"\$(dir)\\\""
+	echo "output = $base_dir/\$(dir)/out"
+	echo "error = $base_dir/\$(dir)/err"
+	echo "log = $base_dir/condor.log"
+
+	#echo "+JobFlavour = \"espresso\"" # 20 minutes
+	#echo "+JobFlavour = \"microcentury\"" # 1 hour
+	echo "+MaxRuntime = 7200" # in s
+
+	echo "+JobBatchName = \"$job_name\""
+
+	echo "requirements = (OpSysAndVer =?= \"SLCern6\")"
+
+) > "$sub_script"
+
+buffer=""
+buffer_size=0
+block_idx=0
+
+for row in `cat $input_file`
+do
+	buffer="$buffer $row"
+	let buffer_size+=1
+
+	if [ "$buffer_size" -ge "$files_per_block" ]
+	then
+		FlushBlock
+	fi
 done
+
+if [ "$buffer_size" -gt "0" ]
+then
+	FlushBlock
+fi
 
 echo "Submitting ..."
 condor_submit "$sub_script"
