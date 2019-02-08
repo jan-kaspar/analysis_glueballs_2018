@@ -804,6 +804,10 @@ bool PromptAnalyzer::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
   histosTH1F["hvtxz"]->Fill(zvtx);
   histosTH1F["hvtxchi2"]->Fill(chi2vtx);
 
+  // cut on vertex z position
+  if (fabs(zvtx) > 24)
+    return returnStatus;
+
   //--------------------------------------------------------------------------------
   // process RP data
 
