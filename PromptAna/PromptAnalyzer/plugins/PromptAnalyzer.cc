@@ -1187,7 +1187,10 @@ bool PromptAnalyzer::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
       vector<DEDxInfo> dEdxInfo;
 
       int itref4=0;
+
       bool etaCutSatisfied = true;
+      bool allTracksHavePixelHit = true;
+
       for (TrackCollection::const_iterator itTrack = tracks->begin(); itTrack != tracks->end(); ++itTrack)
       {
         int npixelhits = itTrack->hitPattern().numberOfValidPixelHits();
@@ -1200,6 +1203,9 @@ bool PromptAnalyzer::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
         if (fabs(itTrack->eta()) > 2.5)
           etaCutSatisfied = false;
+
+        if (npixelhits == 0)
+          allTracksHavePixelHit = false;
 
         if (npixelhits > 0)
         {
@@ -1245,6 +1251,9 @@ bool PromptAnalyzer::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
       histosTH1F["heta4"]->Fill(pi4neg2.Eta());
 
       if (!etaCutSatisfied)
+        return returnStatus;
+
+      if (!allTracksHavePixelHit)
         return returnStatus;
 
       //------------------------
