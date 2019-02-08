@@ -1170,6 +1170,7 @@ bool PromptAnalyzer::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
       vector<DEDxInfo> dEdxInfo;
 
       int itref4=0;
+      bool etaCutSatisfied = true;
       for (TrackCollection::const_iterator itTrack = tracks->begin(); itTrack != tracks->end(); ++itTrack)
       {
         int npixelhits = itTrack->hitPattern().numberOfValidPixelHits();
@@ -1179,6 +1180,9 @@ bool PromptAnalyzer::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
         itref4++;
 
         dEdxInfo.push_back({npixelhits, itTrack->p(), thisdedxPIX});
+
+        if (fabs(itTrack->eta()) > 2.5)
+          etaCutSatisfied = false;
 
         if (npixelhits > 0)
         {
@@ -1222,6 +1226,9 @@ bool PromptAnalyzer::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
       histosTH1F["heta4"]->Fill(pi4neg1.Eta());
       histosTH1F["heta4"]->Fill(pi4pos2.Eta());
       histosTH1F["heta4"]->Fill(pi4neg2.Eta());
+
+      if (!etaCutSatisfied)
+        return returnStatus;
 
       //------------------------
       // rho-rho
