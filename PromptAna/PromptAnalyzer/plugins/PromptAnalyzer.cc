@@ -566,6 +566,7 @@ bool PromptAnalyzer::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
   int ntrk4pos=0;
   int ntrk4neg=0;
 
+  /*
   bool is2PIsample = false;
   bool is2Ksample = false;
 
@@ -580,6 +581,7 @@ bool PromptAnalyzer::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
   bool is2PIsample5 = false;
   bool is2Ksample5 = false;
+  */
 
   //----------------------------------------------------------------------
   // process tracks
@@ -623,6 +625,7 @@ bool PromptAnalyzer::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
       histosTH1F["hdedxDetector"]->Fill(hdedxDetector);
       histosTH2F["hdedxSTRvsPIX"]->Fill(thisdedxPIX,thisdedx);
 
+      /*
       if ( isPionCurve(itTrack->p(),thisdedxPIX) && itTrack->p()<0.6 ) is2PIsample=true;
       if ( isKaonCurve(itTrack->p(),thisdedxPIX) && itTrack->p()<0.5 ) is2Ksample=true;
 
@@ -637,6 +640,7 @@ bool PromptAnalyzer::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
       if ( isPionCurve(itTrack->p(),thisdedxPIX) && itTrack->p()<0.50 ) is2PIsample5=true;
       if ( isKaonCurve(itTrack->p(),thisdedxPIX) && itTrack->p()<0.50 ) is2Ksample5=true;
+      */
 
       histosTH1F["hpt"]->Fill(pt);
       histosTH1F["heta"]->Fill(eta);
