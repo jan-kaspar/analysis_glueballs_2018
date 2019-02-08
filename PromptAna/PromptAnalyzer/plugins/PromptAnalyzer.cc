@@ -106,7 +106,7 @@ class PromptAnalyzer : public edm::one::EDFilter<>
     edm::EDGetTokenT<reco::TrackCollection> trkToken_;
     edm::EDGetTokenT<edm::ValueMap<reco::DeDxData>> dedxToken_ ;
     edm::EDGetTokenT<edm::ValueMap<reco::DeDxData>> dedxPIXToken_ ;
-    edm::EDGetTokenT<reco::DeDxHitInfoAss> dedxpixelToken_ ;
+    //edm::EDGetTokenT<reco::DeDxHitInfoAss> dedxpixelToken_ ;
     edm::EDGetTokenT<vector<CTPPSLocalTrackLite> > RPtrkToken_;
     edm::EDGetTokenT<reco::VertexCollection> vtxToken_;
     //edm::EDGetTokenT<edm::TriggerResults>  trigToken_;
@@ -126,7 +126,7 @@ PromptAnalyzer::PromptAnalyzer(const edm::ParameterSet& iConfig) :
   trkToken_(consumes<reco::TrackCollection>(iConfig.getParameter<edm::InputTag>("tracks"))),
   dedxToken_(consumes<edm::ValueMap<reco::DeDxData>>(iConfig.getParameter<edm::InputTag>("dedxs"))),
   dedxPIXToken_(consumes<edm::ValueMap<reco::DeDxData>>(iConfig.getParameter<edm::InputTag>("dedxPIXs"))),
-  dedxpixelToken_(consumes<reco::DeDxHitInfoAss>(iConfig.getParameter<edm::InputTag>("dedxpixels"))),
+  //dedxpixelToken_(consumes<reco::DeDxHitInfoAss>(iConfig.getParameter<edm::InputTag>("dedxpixels"))),
   RPtrkToken_(consumes<vector<CTPPSLocalTrackLite> >(iConfig.getParameter<edm::InputTag>("RPtracks"))),
   vtxToken_(consumes<reco::VertexCollection>(iConfig.getParameter<edm::InputTag>("vertices"))),
   //pfToken_(consumes<reco::PFCandidateCollection>(iConfig.getParameter<edm::InputTag>("pflows"))),
@@ -483,25 +483,25 @@ bool PromptAnalyzer::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
   edm::Handle<TrackCollection> tracks;
   edm::Handle<edm::ValueMap<reco::DeDxData>> dedxs;
   edm::Handle<edm::ValueMap<reco::DeDxData>> dedxPIXs;
-  edm::Handle<reco::DeDxHitInfoAss> dedxpixels;
+  //edm::Handle<reco::DeDxHitInfoAss> dedxpixels;
   edm::Handle<vector<CTPPSLocalTrackLite> > RPtracks;
   edm::Handle<VertexCollection> vertices;
   //edm::Handle<PFCandidateCollection> pfs;
   //edm::Handle<MuonCollection> muons;
-  edm::Handle<reco::DeDxHitInfoAss> dedxCollH;
+  //edm::Handle<reco::DeDxHitInfoAss> dedxCollH;
 
   iEvent.getByToken(trkToken_, tracks);
   iEvent.getByToken(dedxToken_, dedxs);
   iEvent.getByToken(dedxPIXToken_, dedxPIXs);
-  iEvent.getByToken(dedxpixelToken_, dedxpixels);
+  //iEvent.getByToken(dedxpixelToken_, dedxpixels);
   iEvent.getByToken(RPtrkToken_, RPtracks);
   iEvent.getByToken(vtxToken_, vertices);
   //iEvent.getByToken(pfToken_, pfs);
   //iEvent.getByToken(muToken_, muons);
-  iEvent.getByLabel("dedxHitInfo", dedxCollH);
+  //iEvent.getByLabel("dedxHitInfo", dedxCollH);
 
-  if (!dedxpixels.isValid())
-    printf("Invalid dedxCollH\n");
+  //if (!dedxpixels.isValid())
+  //.  printf("Invalid dedxCollH\n");
 
   int LS = iEvent.luminosityBlock();
   histosTH1F["hLS"]->Fill(LS);
@@ -1145,7 +1145,7 @@ bool PromptAnalyzer::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
         itref4++;
 
-        if (npixelhits>0)
+        if (npixelhits > 0)
         {
           histosTH2F["hdedx4trk"]->Fill(itTrack->p(),thisdedxPIX);
           histosTH2F["hdedx4trklog"]->Fill(itTrack->p(),TMath::Log10(thisdedxPIX));
