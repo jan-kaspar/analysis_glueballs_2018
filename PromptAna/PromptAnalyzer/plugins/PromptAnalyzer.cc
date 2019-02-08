@@ -1135,7 +1135,7 @@ bool PromptAnalyzer::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
   if (ntrk == 4 && totcharge == 0 && ntrkvtx == 4)
   {
-    bool CTpxcut4 = TMath::Abs(CMSpx4+TOTEMpx) < 0.15;
+    bool CTpxcut4 = TMath::Abs(CMSpx4+TOTEMpx) < 0.13;
     bool CTpycut4 = TMath::Abs(CMSpy4+TOTEMpy) < 0.06;
 
     bool CTpycut4BKG = fabs(CMSpy4+TOTEMpy) > 0.06 && fabs(CMSpy4+TOTEMpy) < 0.3;
