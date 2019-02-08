@@ -191,7 +191,8 @@ void PromptAnalyzer::beginJob()
   //--------------------------------------
   // RPs
 
-  histosTH1F["hnconf"] = new TH1F("hnconf", "Number of configurations (TB or BT or TT or BB)" , 5, 0., 5.);
+  histosTH1F["hnconf"] = new TH1F("", "Number of configurations (TB or BT or TT or BB)" , 5, 0., 5.);
+  histosTH1F["hnConfClean"] = new TH1F("", "Number of clean configurations (TB or BT or TT or BB)" , 5, 0., 5.);
 
   vector<string> labRP;
   labRP.push_back("TB"); labRP.push_back("BT"); labRP.push_back("TT"); labRP.push_back("BB");
@@ -886,15 +887,27 @@ bool PromptAnalyzer::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
   bool top45_top56      = rp_valid_024 && rp_valid_004 && rp_valid_104 && rp_valid_124;
   bool bot45_bot56      = rp_valid_025 && rp_valid_005 && rp_valid_105 && rp_valid_125;
 
+  bool clean_bot45_top56 = (!rp_valid_024 && rp_valid_025) && (!rp_valid_004 && rp_valid_005) && (rp_valid_104 && !rp_valid_105) && (rp_valid_124 && !rp_valid_125);
+  bool clean_top45_bot56 = (rp_valid_024 && !rp_valid_025) && (rp_valid_004 && !rp_valid_005) && (!rp_valid_104 && rp_valid_105) && (!rp_valid_124 && rp_valid_125);
+  bool clean_top45_top56 = (rp_valid_024 && !rp_valid_025) && (rp_valid_004 && !rp_valid_005) && (rp_valid_104 && !rp_valid_105) && (rp_valid_124 && !rp_valid_125);
+  bool clean_bot45_bot56 = (!rp_valid_024 && rp_valid_025) && (!rp_valid_004 && rp_valid_005) && (!rp_valid_104 && rp_valid_105) && (!rp_valid_124 && rp_valid_125);
+
   int nconf=0;
   if (diag_top45_bot56) nconf++;
   if (diag_bot45_top56) nconf++;
   if (top45_top56) nconf++;
   if (bot45_bot56) nconf++;
 
-  histosTH1F["hnconf"]->Fill(nconf);
+  unsigned int nConfClean = 0;
+  if (clean_top45_bot56) nConfClean++;
+  if (clean_bot45_top56) nConfClean++;
+  if (clean_top45_top56) nConfClean++;
+  if (clean_bot45_bot56) nConfClean++;
 
-  if (nconf != 1)
+  histosTH1F["hnconf"]->Fill(nconf);
+  histosTH1F["hnConfClean"]->Fill(nConfClean);
+
+  if (nConfClean != 1)
     return returnStatus;
 
   // topology: 1 - TB, 2 - BT, 3 - TT, 4 - BB
@@ -1027,15 +1040,15 @@ bool PromptAnalyzer::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
   double TOTEMpy =  6500.*(ThyL+ThyR);
   double TOTEMpx = -6500.*(ThxL+ThxR);
-  double TOTEMphiL = TMath::ATan2(ThyL,ThxL);
-  double TOTEMphiR = TMath::ATan2(ThyR,ThxR);
+  double TOTEMphiL = TMath::ATan2(ThyL, ThxL);
+  double TOTEMphiR = TMath::ATan2(ThyR, ThxR);
 
-  double TOTEMdphi = TOTEMphiL-TOTEMphiR;
-  if(TOTEMdphi<0) TOTEMdphi = TOTEMdphi + 2.*TMath::Pi(); // from (-2pi,2pi) to (0,2pi)
-  if(TOTEMdphi>TMath::Pi()) TOTEMdphi = 2.*TMath::Pi() - TOTEMdphi; // from (0,2pi) to (0,pi)
+  double TOTEMdphi = TOTEMphiL - TOTEMphiR;
+  if (TOTEMdphi < 0) TOTEMdphi = TOTEMdphi + 2.*TMath::Pi(); // from (-2pi,2pi) to (0,2pi)
+  if (TOTEMdphi > TMath::Pi()) TOTEMdphi = 2.*TMath::Pi() - TOTEMdphi; // from (0,2pi) to (0,pi)
 
-  double CMSpx=pipiRec.Px();
-  double CMSpy=pipiRec.Py();
+  //double CMSpx=pipiRec.Px();
+  //double CMSpy=pipiRec.Py();
 
   //--------------------------------------------------------------------------------
   // plots for 2 tracks sample
