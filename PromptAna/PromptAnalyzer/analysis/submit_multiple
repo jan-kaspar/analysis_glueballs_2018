@@ -3,7 +3,7 @@
 #input_dir="input/AOD"
 input_dir="input/reduced"
 
-output_dir="output_test"
+output_dir="output_vtxZ_eta_px130_pixReq_noExtAct"
 
 streams=(
 	"TOTEM2"
@@ -21,11 +21,13 @@ runs=(
 	"319311"
 )
 
+files_per_block="15"
+
 for stream in ${streams[*]}
 do
 	for run in ${runs[*]}
 	do
 		echo "$stream $run"
-		./submit "$stream/$run" "$input_dir/${stream}_${run}" "$output_dir/${stream}/${run}"
+		./submit "$stream/$run" "$input_dir/${stream}_${run}" "$output_dir/${stream}/${run}" "$files_per_block"
 	done
 done

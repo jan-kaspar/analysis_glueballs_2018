@@ -4,7 +4,7 @@
 
 function PrintUsage()
 {
-	echo "USAGE: submit [job name] [input file] [output dir]"
+	echo "USAGE: submit [job name] [input file] [output dir] [file per block]"
 }
 
 #----------------------------------------------------------------------------------------------------
@@ -37,11 +37,11 @@ function MakeCfg()
 job_name="$1"
 input_file="$2"
 output_dir="$3"
-files_per_block="2" # TODO
+files_per_block="$4"
 
 cwd=`pwd -P`
 
-if [ -z "$job_name" -o ! -f "$input_file" -o -z "$output_dir" ]
+if [ -z "$job_name" -o ! -f "$input_file" -o -z "$output_dir" -o -z "$files_per_block" ]
 then
 	PrintUsage
 	exit 1
@@ -57,8 +57,6 @@ base_dir="$cwd/$output_dir"
 
 function FlushBlock()
 {
-	#TODO
-
 	idxDir="idx$block_idx"
 	dir="$output_dir/$idxDir"
 	echo "* $dir"
@@ -103,7 +101,7 @@ function FlushBlock()
 	#echo "+JobFlavour = \"microcentury\"" # 1 hour
 	echo "+MaxRuntime = 7200" # in s
 
-	echo "+JobBatchName = \"$job_name\""
+	echo "+JobBatchName = \"$output_dir\""
 
 	echo "requirements = (OpSysAndVer =?= \"SLCern6\")"
 
