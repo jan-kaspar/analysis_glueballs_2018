@@ -205,11 +205,10 @@ void PromptAnalyzer::beginJob()
   histosTH1F["hnConf"] = new TH1F("", "Number of configurations (TB or BT or TT or BB)" , 5, 0., 5.);
   histosTH1F["hnConfClean"] = new TH1F("", "Number of clean configurations (TB or BT or TT or BB)" , 5, 0., 5.);
 
-  vector<string> labRP;
-  labRP.push_back("TB"); labRP.push_back("BT"); labRP.push_back("TT"); labRP.push_back("BB");
-
-  histosTH1F["hconf"]  = new TH1F("hconf"," ",labRP.size(),0,labRP.size());
-  for(size_t k = 0; k < labRP.size(); ++k){histosTH1F["hconf"]->GetXaxis()->SetBinLabel((k+1),labRP[k].c_str()); }
+  vector<string> labRP = { "TB", "BT", "TT", "BB" };
+  histosTH1F["hConf"]  = new TH1F("", "", labRP.size(), 0, labRP.size());
+  for (size_t k = 0; k < labRP.size(); ++k)
+    histosTH1F["hConf"]->GetXaxis()->SetBinLabel((k+1), labRP[k].c_str());
 
   histosTH1F["hthyEla"] = new TH1F("hthyEla"  ,"#theta_{Y}^{L}+#theta_{Y}^{R}", 2000 , -0.0004 , 0.0004);
   histosTH1F["hthxEla"] = new TH1F("hthxEla"  ,"#theta_{X}^{L}+#theta_{X}^{R}", 2000 , -0.0004 , 0.0004);
@@ -302,7 +301,8 @@ void PromptAnalyzer::beginJob()
   histosTH1F["hm4PHImassSafePionProtonVeto"] = new TH1F("hm4PHImassSafePionProtonVeto", "M_{4K}, #varphi#varphi + Pion Veto",massbins4,0.,10.);
   histosTH1F["hm4PHImass1234curvesSafePionProtonVeto"] = new TH1F("hm4PHImass1234curvesSafePionProtonVeto", "M_{4K}, #varphi#varphi + >=1K curves + Pion Veto",massbins4,0.,10.);
 
-  histosTH1F["hm4PHImass2SS"] = new TH1F("", "M_{4K}, #varphi#varphi + >=3K curves or 2K same sign",massbins4,0.,10.);
+  histosTH1F["hm4PHImass2SS"] = new TH1F("", "",massbins4,0.,10.);
+  histosTH1F["hm4PHImass2SSSafePionProtonVeto"] = new TH1F("", "",massbins4,0.,10.);
 
   histosTH1F["hm4PHImass_PhiCutStrict"] = new TH1F("hm4PHImass_PhiCutStrict", "M_{4K}, #varphi#varphi",massbins4,0.,10.);
   histosTH1F["hm4PHImass4curves_PhiCutStrict"] = new TH1F("hm4PHImass4curves_PhiCutStrict", "M_{4K}, #varphi#varphi + 4K curves",massbins4,0.,10.);
@@ -314,7 +314,8 @@ void PromptAnalyzer::beginJob()
   histosTH1F["hm4PHImassSafePionProtonVeto_PhiCutStrict"] = new TH1F("hm4PHImassSafePionProtonVeto_PhiCutStrict", "M_{4K}, #varphi#varphi + SafePionProtonVeto",massbins4,0.,10.);
   histosTH1F["hm4PHImass1234curvesSafePionProtonVeto_PhiCutStrict"] = new TH1F("hm4PHImass1234curvesSafePionProtonVeto_PhiCutStrict", "M_{4K}, #varphi#varphi + >=1K curves + SafePionProtonVeto",massbins4,0.,10.);
 
-  histosTH1F["hm4PHImass2SS_PhiCutStrict"] = new TH1F("", "M_{4K}, #varphi#varphi + >=3K curves or 2K same sign",massbins4,0.,10.);
+  histosTH1F["hm4PHImass2SS_PhiCutStrict"] = new TH1F("", "",massbins4,0.,10.);
+  histosTH1F["hm4PHImass2SSSafePionProtonVeto_PhiCutStrict"] = new TH1F("", "",massbins4,0.,10.);
 
   histosTH1F["h_m_4K_PEAK"] = new TH1F("h_m_4K_PEAK", "M_{4K}", massbins4, 0., 10.);
   histosTH1F["h_m_4pi_PEAK"] = new TH1F("h_pi_4pi_PEAK", "M_{4#pi}", massbins4, 0., 10.);
@@ -423,6 +424,7 @@ void PromptAnalyzer::beginJob()
   histosTH2F["hdedx4PHImass2SS"] = new TH2F(* histosTH2F["hdedx4trk"]);
   histosTH2F["hdedx4PHImassSafePionProtonVeto"] = new TH2F(* histosTH2F["hdedx4trk"]);
   histosTH2F["hdedx4PHImass1234curvesSafePionProtonVeto"] = new TH2F(* histosTH2F["hdedx4trk"]);
+  histosTH2F["hdedx4PHImass2SSSafePionProtonVeto"] = new TH2F(* histosTH2F["hdedx4trk"]);
 
   histosTH2F["hdedx4SIG1mass"] = new TH2F(* histosTH2F["hdedx4trk"]);
   histosTH2F["hdedx4SIG1mass4curves"] = new TH2F(* histosTH2F["hdedx4trk"]);
@@ -463,10 +465,6 @@ void PromptAnalyzer::evaluateDEDxCurves(double p, double &piu3, double &kd3, dou
 
 bool PromptAnalyzer::isPionCurve(double p, double dEdx)
 {
-  // TODO
-  //if (p > 0.5)
-  //  return false;
-
   double piu3, kd3, ku3;
   evaluateDEDxCurves(p, piu3, kd3, ku3);
 
@@ -477,18 +475,14 @@ bool PromptAnalyzer::isPionCurve(double p, double dEdx)
 
 bool PromptAnalyzer::isSafePionCurve(double p, double dEdx)
 {
-  // TODO
-  return false;
+  const double max = 0.9 / p;
+  return (dEdx < max);
 }
 
 //----------------------------------------------------------------------------------------------------
 
 bool PromptAnalyzer::isKaonCurve(double p, double dEdx)
 {
-  // TODO
-  //if (p > 0.5)
-  //  return false;
-
   double piu3, kd3, ku3;
   evaluateDEDxCurves(p, piu3, kd3, ku3);
 
@@ -502,10 +496,6 @@ bool PromptAnalyzer::isKaonCurve(double p, double dEdx)
 
 bool PromptAnalyzer::isProtonCurve(double p, double dEdx)
 {
-  // TODO
-  //if (p > 0.5)
-  //  return false;
-
   double piu3, kd3, ku3;
   evaluateDEDxCurves(p, piu3, kd3, ku3);
 
@@ -1590,6 +1580,13 @@ bool PromptAnalyzer::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
           for (const auto &in : dEdxInfo)
             histosTH2F["hdedx4PHImass1234curvesSafePionProtonVeto"]->Fill(in.p, in.dEdx);
         }
+
+        if (twoKaonsOfTheSameSign && nSafePions == 0 && nProtons == 0)
+        {
+          histosTH1F["hm4PHImass2SSSafePionProtonVeto"]->Fill(mrec4k);
+          for (const auto &in : dEdxInfo)
+            histosTH2F["hdedx4PHImass2SSSafePionProtonVeto"]->Fill(in.p, in.dEdx);
+        }
       }
 
       if (nOKPhiCutStrict > 0)
@@ -1605,7 +1602,10 @@ bool PromptAnalyzer::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
         if (nKcurves >= 2) histosTH1F["hm4PHImass234curves_PhiCutStrict"]->Fill(mrec4k);
         if (nKcurves >= 1) histosTH1F["hm4PHImass1234curves_PhiCutStrict"]->Fill(mrec4k);
 
-        if (twoKaonsOfTheSameSign) histosTH1F["hm4PHImass2SS_PhiCutStrict"]->Fill(mrec4k);
+        if (twoKaonsOfTheSameSign)
+        {
+          histosTH1F["hm4PHImass2SS_PhiCutStrict"]->Fill(mrec4k);
+        }
 
         if (nSafePions == 0 && nProtons == 0)
         {
@@ -1615,6 +1615,11 @@ bool PromptAnalyzer::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
         if (nKcurves >= 1 && nSafePions == 0 && nProtons == 0)
         {
           histosTH1F["hm4PHImass1234curvesSafePionProtonVeto_PhiCutStrict"]->Fill(mrec4k);
+        }
+
+        if (twoKaonsOfTheSameSign && nSafePions == 0 && nProtons == 0)
+        {
+          histosTH1F["hm4PHImass2SSSafePionProtonVeto_PhiCutStrict"]->Fill(mrec4k);
         }
       }
 
