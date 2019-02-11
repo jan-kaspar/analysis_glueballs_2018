@@ -29,12 +29,15 @@ process.analyzer = cms.EDFilter("PromptAnalyzer",
   tracks = cms.InputTag('generalTracks'),
   dedxs = cms.InputTag('dedxHarmonic2'),
   dedxPIXs = cms.InputTag('dedxPixelHarmonic2'),
-  dedxpixels = cms.InputTag('dedxHitInfo'),
-  RPtracks = cms.InputTag('ctppsLocalTrackLiteProducer'),
+  #dedxpixels = cms.InputTag('dedxHitInfo'),
   vertices = cms.InputTag('offlinePrimaryVertices'),
-  triggers = cms.InputTag('TriggerResults','','HLT'),
-  pflows = cms.InputTag('particleFlow'),
-  muons = cms.InputTag('muons'),
+  #triggers = cms.InputTag('TriggerResults','','HLT'),
+  #pflows = cms.InputTag('particleFlow'),
+  #muons = cms.InputTag('muons'),
+
+  rpRecHitTag = cms.InputTag('totemRPRecHitProducer'),
+  rpPatternTag = cms.InputTag('totemRPUVPatternFinder'),
+  rpTrackTag = cms.InputTag('ctppsLocalTrackLiteProducer'),
 
   outputFileName = cms.string("output.root")
 )

@@ -57,6 +57,8 @@
 
 // PPS
 #include "DataFormats/CTPPSDetId/interface/TotemRPDetId.h"
+#include "DataFormats/CTPPSReco/interface/TotemRPRecHit.h"
+#include "DataFormats/CTPPSReco/interface/TotemRPUVPattern.h"
 #include "DataFormats/CTPPSReco/interface/CTPPSLocalTrackLite.h"
 
 // PFCandidates
@@ -110,12 +112,15 @@ class PromptAnalyzer : public edm::one::EDFilter<>
     edm::EDGetTokenT<edm::ValueMap<reco::DeDxData>> dedxToken_ ;
     edm::EDGetTokenT<edm::ValueMap<reco::DeDxData>> dedxPIXToken_ ;
     //edm::EDGetTokenT<reco::DeDxHitInfoAss> dedxpixelToken_ ;
-    edm::EDGetTokenT<vector<CTPPSLocalTrackLite> > RPtrkToken_;
     edm::EDGetTokenT<reco::VertexCollection> vtxToken_;
     //edm::EDGetTokenT<edm::TriggerResults>  trigToken_;
     //edm::EDGetTokenT<reco::PFCandidateCollection> pfToken_;
     //edm::EDGetTokenT<reco::MuonCollection> muToken_;
     //edm::EDGetTokenT<edmNew::DetSetVector<SiPixelCluster> > clusterToken_;
+
+    edm::EDGetTokenT<edm::DetSetVector<TotemRPRecHit>> rpRecHitToken_;
+    edm::EDGetTokenT<edm::DetSetVector<TotemRPUVPattern>> rpPatternToken_;
+    edm::EDGetTokenT<vector<CTPPSLocalTrackLite>> rpTrackToken_;
 
     map<string, TH1F*> histosTH1F;
     map<string, TH2F*> histosTH2F;
@@ -130,10 +135,13 @@ PromptAnalyzer::PromptAnalyzer(const edm::ParameterSet& iConfig) :
   dedxToken_(consumes<edm::ValueMap<reco::DeDxData>>(iConfig.getParameter<edm::InputTag>("dedxs"))),
   dedxPIXToken_(consumes<edm::ValueMap<reco::DeDxData>>(iConfig.getParameter<edm::InputTag>("dedxPIXs"))),
   //dedxpixelToken_(consumes<reco::DeDxHitInfoAss>(iConfig.getParameter<edm::InputTag>("dedxpixels"))),
-  RPtrkToken_(consumes<vector<CTPPSLocalTrackLite> >(iConfig.getParameter<edm::InputTag>("RPtracks"))),
   vtxToken_(consumes<reco::VertexCollection>(iConfig.getParameter<edm::InputTag>("vertices"))),
   //pfToken_(consumes<reco::PFCandidateCollection>(iConfig.getParameter<edm::InputTag>("pflows"))),
   //muToken_(consumes<reco::MuonCollection>(iConfig.getParameter<edm::InputTag>("muons"))),
+
+  rpRecHitToken_(consumes<edm::DetSetVector<TotemRPRecHit>>(iConfig.getParameter<edm::InputTag>("rpRecHitTag"))),
+  rpPatternToken_(consumes<edm::DetSetVector<TotemRPUVPattern>>(iConfig.getParameter<edm::InputTag>("rpPatternTag"))),
+  rpTrackToken_(consumes<vector<CTPPSLocalTrackLite>>(iConfig.getParameter<edm::InputTag>("rpTrackTag"))),
 
   outputFileName(iConfig.getParameter<std::string>("outputFileName"))
 {
@@ -194,7 +202,7 @@ void PromptAnalyzer::beginJob()
   //--------------------------------------
   // RPs
 
-  histosTH1F["hnconf"] = new TH1F("", "Number of configurations (TB or BT or TT or BB)" , 5, 0., 5.);
+  histosTH1F["hnConf"] = new TH1F("", "Number of configurations (TB or BT or TT or BB)" , 5, 0., 5.);
   histosTH1F["hnConfClean"] = new TH1F("", "Number of clean configurations (TB or BT or TT or BB)" , 5, 0., 5.);
 
   vector<string> labRP;
@@ -523,24 +531,38 @@ bool PromptAnalyzer::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
   // get input
   edm::Handle<TrackCollection> tracks;
-  edm::Handle<edm::ValueMap<reco::DeDxData>> dedxs;
-  edm::Handle<edm::ValueMap<reco::DeDxData>> dedxPIXs;
-  //edm::Handle<reco::DeDxHitInfoAss> dedxpixels;
-  edm::Handle<vector<CTPPSLocalTrackLite> > RPtracks;
-  edm::Handle<VertexCollection> vertices;
-  //edm::Handle<PFCandidateCollection> pfs;
-  //edm::Handle<MuonCollection> muons;
-  //edm::Handle<reco::DeDxHitInfoAss> dedxCollH;
-
   iEvent.getByToken(trkToken_, tracks);
+
+  edm::Handle<edm::ValueMap<reco::DeDxData>> dedxs;
   iEvent.getByToken(dedxToken_, dedxs);
+
+  edm::Handle<edm::ValueMap<reco::DeDxData>> dedxPIXs;
   iEvent.getByToken(dedxPIXToken_, dedxPIXs);
+
+  //edm::Handle<reco::DeDxHitInfoAss> dedxpixels;
   //iEvent.getByToken(dedxpixelToken_, dedxpixels);
-  iEvent.getByToken(RPtrkToken_, RPtracks);
+
+  edm::Handle<VertexCollection> vertices;
   iEvent.getByToken(vtxToken_, vertices);
+
+  //edm::Handle<PFCandidateCollection> pfs;
   //iEvent.getByToken(pfToken_, pfs);
+
+  //edm::Handle<MuonCollection> muons;
   //iEvent.getByToken(muToken_, muons);
+
+  //edm::Handle<reco::DeDxHitInfoAss> dedxCollH;
   //iEvent.getByLabel("dedxHitInfo", dedxCollH);
+
+  edm::Handle<edm::DetSetVector<TotemRPRecHit>> hRPRecHits;
+  iEvent.getByToken(rpRecHitToken_, hRPRecHits);
+
+  edm::Handle<edm::DetSetVector<TotemRPUVPattern>> hRPPatterns;
+  iEvent.getByToken(rpPatternToken_, hRPPatterns);
+
+  edm::Handle<vector<CTPPSLocalTrackLite>> hRPTracks;
+  iEvent.getByToken(rpTrackToken_, hRPTracks);
+
 
   //if (!dedxpixels.isValid())
   //.  printf("Invalid dedxCollH\n");
@@ -885,11 +907,69 @@ bool PromptAnalyzer::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
   const double mean_y105 = 1.312;
   const double mean_y125 = 0.316;
 
+  // buffer for RP data
+  struct StripInfo
+  {
+      set<unsigned int> u_planes;
+      set<unsigned int> v_planes;
+
+      map<unsigned int, unsigned int> clustersPerPlane;
+
+      bool u_tooFull = false;
+      bool v_tooFull = false;
+
+      unsigned int u_patterns = 0;
+      unsigned int v_patterns = 0;
+
+      bool hasActiv = false;
+      bool hasTrack = false;
+  };
+
+  map<unsigned int, StripInfo> rpInfo;
+
+  // process rec hits
+  for (const auto &dsRecHits : *hRPRecHits)
+  {
+      TotemRPDetId planeId(dsRecHits.detId());
+      unsigned int rpDecId = planeId.arm()*100 + planeId.station()*10 + planeId.rp();
+      unsigned int planeIdx = planeId.plane();
+
+      rpInfo[rpDecId].clustersPerPlane[planeIdx] = dsRecHits.size();
+
+      if (dsRecHits.size() == 0)
+          continue;
+
+      if ((planeIdx % 2) == 0)
+          rpInfo[rpDecId].v_planes.insert(planeIdx);
+      else
+          rpInfo[rpDecId].u_planes.insert(planeIdx);
+  }
+
+  // process patterns
+  for (const auto &dsPatterns : *hRPPatterns)
+  {
+      TotemRPDetId rpId(dsPatterns.detId());
+      unsigned int rpDecId = rpId.arm()*100 + rpId.station()*10 + rpId.rp();
+
+      for (const auto &pat : dsPatterns)
+      {
+          if (! pat.getFittable())
+              continue;
+
+          if (pat.getProjection() == TotemRPUVPattern::projU)
+              rpInfo[rpDecId].u_patterns++;
+          if (pat.getProjection() == TotemRPUVPattern::projV)
+              rpInfo[rpDecId].v_patterns++;
+      }
+  }
+
   // process track data
-  for (const auto &tr : *RPtracks)
+  for (const auto &tr : *hRPTracks)
   {
     CTPPSDetId rpId(tr.getRPId());
     unsigned int rpDecId = 100*rpId.arm() + 10*rpId.station() + 1*rpId.rp();
+
+    rpInfo[rpDecId].hasTrack = true;
 
     if(rpDecId == 4) {rp_valid_004 = true; xLN = tr.getX() + mean_x4; yLN = tr.getY() + mean_y4;}
     if(rpDecId == 5) {rp_valid_005 = true; xLN = tr.getX() + mean_x5; yLN = tr.getY() + mean_y5;}
@@ -904,16 +984,40 @@ bool PromptAnalyzer::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
     if(rpDecId == 125) {rp_valid_125 = true; xRF = tr.getX() + mean_x125; yRF = tr.getY() + mean_y125;}
   }
 
+  // process all RP inputs
+  for (auto &p : rpInfo)
+  {
+      auto &info = p.second;
+
+      unsigned int n_too_full_u = 0, n_too_full_v = 0;
+
+      for (const auto &clP : info.clustersPerPlane)
+      {
+          if (clP.second <= 5)
+              continue;
+
+          if ((clP.first % 2) == 1)
+              n_too_full_u++;
+          else
+              n_too_full_v++;
+      }
+
+      info.u_tooFull = (n_too_full_u >= 3);
+      info.v_tooFull = (n_too_full_v >= 3);
+
+      info.hasActiv = info.hasTrack || info.u_patterns > 0 || info.v_patterns > 0 || info.u_tooFull || info.v_tooFull;
+  }
+
   bool diag_top45_bot56 = rp_valid_024 && rp_valid_004 && rp_valid_105 && rp_valid_125;
   bool diag_bot45_top56 = rp_valid_025 && rp_valid_005 && rp_valid_104 && rp_valid_124;
 
   bool top45_top56      = rp_valid_024 && rp_valid_004 && rp_valid_104 && rp_valid_124;
   bool bot45_bot56      = rp_valid_025 && rp_valid_005 && rp_valid_105 && rp_valid_125;
 
-  bool clean_bot45_top56 = (!rp_valid_024 && rp_valid_025) && (!rp_valid_004 && rp_valid_005) && (rp_valid_104 && !rp_valid_105) && (rp_valid_124 && !rp_valid_125);
-  bool clean_top45_bot56 = (rp_valid_024 && !rp_valid_025) && (rp_valid_004 && !rp_valid_005) && (!rp_valid_104 && rp_valid_105) && (!rp_valid_124 && rp_valid_125);
-  bool clean_top45_top56 = (rp_valid_024 && !rp_valid_025) && (rp_valid_004 && !rp_valid_005) && (rp_valid_104 && !rp_valid_105) && (rp_valid_124 && !rp_valid_125);
-  bool clean_bot45_bot56 = (!rp_valid_024 && rp_valid_025) && (!rp_valid_004 && rp_valid_005) && (!rp_valid_104 && rp_valid_105) && (!rp_valid_124 && rp_valid_125);
+  bool clean_bot45_top56 = (!rpInfo[24].hasActiv && rpInfo[25].hasTrack) && (!rpInfo[4].hasActiv && rpInfo[5].hasTrack) && (rpInfo[104].hasTrack && !rpInfo[105].hasActiv) && (rpInfo[124].hasTrack && !rpInfo[125].hasActiv);
+  bool clean_top45_bot56 = (rpInfo[24].hasTrack && !rpInfo[25].hasActiv) && (rpInfo[4].hasTrack && !rpInfo[5].hasActiv) && (!rpInfo[104].hasActiv && rpInfo[105].hasTrack) && (!rpInfo[124].hasActiv && rpInfo[125].hasTrack);
+  bool clean_top45_top56 = (rpInfo[24].hasTrack && !rpInfo[25].hasActiv) && (rpInfo[4].hasTrack && !rpInfo[5].hasActiv) && (rpInfo[104].hasTrack && !rpInfo[105].hasActiv) && (rpInfo[124].hasTrack && !rpInfo[125].hasActiv);
+  bool clean_bot45_bot56 = (!rpInfo[24].hasActiv && rpInfo[25].hasTrack) && (!rpInfo[4].hasActiv && rpInfo[5].hasTrack) && (!rpInfo[104].hasActiv && rpInfo[105].hasTrack) && (!rpInfo[124].hasActiv && rpInfo[125].hasTrack);
 
   int nconf=0;
   if (diag_top45_bot56) nconf++;
@@ -927,7 +1031,7 @@ bool PromptAnalyzer::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
   if (clean_top45_top56) nConfClean++;
   if (clean_bot45_bot56) nConfClean++;
 
-  histosTH1F["hnconf"]->Fill(nconf);
+  histosTH1F["hnConf"]->Fill(nconf);
   histosTH1F["hnConfClean"]->Fill(nConfClean);
 
   if (nConfClean != 1)
@@ -935,15 +1039,14 @@ bool PromptAnalyzer::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
   // topology: 1 - TB, 2 - BT, 3 - TT, 4 - BB
   int tb = -1;
-  if (diag_top45_bot56) tb=0;
-  if (diag_bot45_top56) tb=1;
-  if (top45_top56) tb=2;
-  if (bot45_bot56) tb=3;
+  if (clean_top45_bot56) tb = 0;
+  if (clean_bot45_top56) tb = 1;
+  if (clean_top45_top56) tb = 2;
+  if (clean_bot45_bot56) tb = 3;
 
-  histosTH1F["hconf"]->Fill(tb);
+  histosTH1F["hConf"]->Fill(tb);
 
   // single-arm kinematics reconstruction
-
   double ThxR, ThyR, ThxL, ThyL;//, xVtxL, xVtxR;
 
   double D_x_L = + v_x_L_1_F * L_x_L_2_F - v_x_L_2_F * L_x_L_1_F;
