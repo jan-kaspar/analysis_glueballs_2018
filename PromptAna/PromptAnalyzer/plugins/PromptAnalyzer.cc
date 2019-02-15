@@ -1,5 +1,5 @@
 // Original Author:  Robert Ciesielski
-// modified by Jan Kaspar
+// modified by Jan Kašpar
 
 // system include files
 #include <memory>
@@ -78,10 +78,7 @@ const double v_y_L_2_F = -0.000000021508565; const double L_y_L_2_F = 271.511335
 
 const double m_pi = 0.13957;
 const double m_k = 0.493677;
-const double m_mu = 0.1056583715;
-const double m_p =0.93827;
-
-enum EPID { pidUnknown, pidProton, pidKaon, pidPion };
+const double m_p = 0.93827;
 
 using namespace edm;
 using namespace reco;
@@ -431,6 +428,8 @@ void PromptAnalyzer::beginJob()
   histosTH2F["hdedx4PHImass1234curvesSafePionProtonVeto"] = new TH2F(* histosTH2F["hdedx4trk"]);
   histosTH2F["hdedx4PHImass2SSSafePionProtonVeto"] = new TH2F(* histosTH2F["hdedx4trk"]);
 
+  histosTH2F["hdedx4PHImass_PEAK"] = new TH2F(* histosTH2F["hdedx4trk"]);
+
   histosTH2F["hdedx4SIG1mass"] = new TH2F(* histosTH2F["hdedx4trk"]);
   histosTH2F["hdedx4SIG1mass4curves"] = new TH2F(* histosTH2F["hdedx4trk"]);
   histosTH2F["hdedx4SIG1mass34curves"] = new TH2F(* histosTH2F["hdedx4trk"]);
@@ -583,8 +582,6 @@ bool PromptAnalyzer::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
   TLorentzVector k2(0.,0.,0.,0.);
   TLorentzVector kkRec(0.,0.,0.,0.);
 
-  TLorentzVector mmRec(0.,0.,0.,0.);
-
   // tracks in 4-track-events (npixelhits>0)
   TLorentzVector pi4pos1(0.,0.,0.,0.);
   TLorentzVector pi4pos2(0.,0.,0.,0.);
@@ -697,41 +694,40 @@ bool PromptAnalyzer::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
       totcharge += charge;
 
+      // four-momenta with different mass hypotheses
+      const double ene_pi = sqrt(pt*pt + pz*pz + m_pi*m_pi);
+      const TLorentzVector trk_lorentz_pi(itTrack->px(), itTrack->py(), itTrack->pz(), ene_pi);
+
+      const double ene_K = sqrt(pt*pt + pz*pz + m_k*m_k);
+      const TLorentzVector trk_lorentz_K(itTrack->px(), itTrack->py(), itTrack->pz(), ene_K);
+
       //--------------------------------------
       // 2 trk
-      double ene=TMath::Sqrt(pt*pt+pz*pz+m_pi*m_pi);
-      TLorentzVector trk_lorentz(itTrack->px(),itTrack->py(),itTrack->pz(),ene);
-      pipiRec += trk_lorentz;
 
-      if(ntrk==0) pi1 = trk_lorentz;
-      if(ntrk==1) pi2 = trk_lorentz;
+      if (ntrk==0) pi1 = trk_lorentz_pi;
+      if (ntrk==1) pi2 = trk_lorentz_pi;
 
-      double eneK=TMath::Sqrt(pt*pt+pz*pz+m_k*m_k);
-      TLorentzVector trk_lorentzK(itTrack->px(),itTrack->py(),itTrack->pz(),eneK);
-      kkRec += trk_lorentzK;
+      if (ntrk==0) k1 = trk_lorentz_K;
+      if (ntrk==1) k2 = trk_lorentz_K;
 
-      if(ntrk==0) k1 = trk_lorentzK;
-      if(ntrk==1) k2 = trk_lorentzK;
-
-      double eneM=TMath::Sqrt(pt*pt+pz*pz+m_mu*m_mu);
-      TLorentzVector trk_lorentzM(itTrack->px(),itTrack->py(),itTrack->pz(),eneM);
-      mmRec += trk_lorentzM;
+      pipiRec += trk_lorentz_pi;
+      kkRec += trk_lorentz_K;
 
       //--------------------------------------
       // 4trk
 
-      pi4Rec += trk_lorentz;
-      k4Rec  += trk_lorentzK;
+      pi4Rec += trk_lorentz_pi;
+      k4Rec  += trk_lorentz_K;
 
       if (charge > 0)
       {
-        if (ntrk4pos==0) pi4pos1 = trk_lorentz;
-        if (ntrk4pos==1) pi4pos2 = trk_lorentz;
+        if (ntrk4pos == 0) pi4pos1 = trk_lorentz_pi;
+        if (ntrk4pos == 1) pi4pos2 = trk_lorentz_pi;
 
-        if (ntrk4pos==0) k4pos1 = trk_lorentzK;
-        if (ntrk4pos==1) k4pos2 = trk_lorentzK;
+        if (ntrk4pos == 0) k4pos1 = trk_lorentz_K;
+        if (ntrk4pos == 1) k4pos2 = trk_lorentz_K;
 
-        if (ntrk4pos<2)
+        if (ntrk4pos < 2)
         {
           if( isPionCurve(itTrack->p(),thisdedxPIX) ) ispion4pos[ntrk4pos] = true;
           if( isKaonCurve(itTrack->p(),thisdedxPIX) ) iskaon4pos[ntrk4pos] = true;
@@ -742,13 +738,13 @@ bool PromptAnalyzer::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
       if (charge < 0)
       {
-        if (ntrk4neg==0) pi4neg1 = trk_lorentz;
-        if (ntrk4neg==1) pi4neg2 = trk_lorentz;
+        if (ntrk4neg == 0) pi4neg1 = trk_lorentz_pi;
+        if (ntrk4neg == 1) pi4neg2 = trk_lorentz_pi;
 
-        if (ntrk4neg==0) k4neg1 = trk_lorentzK;
-        if (ntrk4neg==1) k4neg2 = trk_lorentzK;
+        if (ntrk4neg == 0) k4neg1 = trk_lorentz_K;
+        if (ntrk4neg == 1) k4neg2 = trk_lorentz_K;
 
-        if (ntrk4neg<2)
+        if (ntrk4neg < 2)
         {
           if ( isPionCurve(itTrack->p(),thisdedxPIX) ) ispion4neg[ntrk4pos] = true;
           if ( isKaonCurve(itTrack->p(),thisdedxPIX) ) iskaon4neg[ntrk4pos] = true;
@@ -1268,8 +1264,8 @@ bool PromptAnalyzer::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
   //--------------------------------------------------------------------------------
   // plots for 4 tracks sample
 
-  double CMSpx4=pi4Rec.Px();
-  double CMSpy4=pi4Rec.Py();
+  const double CMSpx4 = pi4Rec.Px();
+  const double CMSpy4 = pi4Rec.Py();
 
   if (ntrk == 4 && totcharge == 0 && ntrkvtx == 4)
   {
@@ -1288,8 +1284,8 @@ bool PromptAnalyzer::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
     histosTH2F["h2DIMdpy4trk"]->Fill(CMSpy4, TOTEMpy);
     histosTH2F["h2DIMdpx4trk"]->Fill(CMSpx4, TOTEMpx);
 
-    double mrec4 = pi4Rec.M();
-    double mrec4k = k4Rec.M();
+    // TODO
+    const double mrec4 = pi4Rec.M();
 
     if (allCuts4)
     {
@@ -1482,17 +1478,13 @@ bool PromptAnalyzer::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
       //------------------------
       // phi-phi
 
-      const TLorentzVector k4m11 = k4pos1 + k4neg1;
-      const TLorentzVector k4m22 = k4pos2 + k4neg2;
+      const double m11k = (k4pos1 + k4neg1).M();
+      const double m22k = (k4pos2 + k4neg2).M();
 
-      const TLorentzVector k4m12 = k4pos1 + k4neg2;
-      const TLorentzVector k4m21 = k4pos2 + k4neg1;
+      const double m12k = (k4pos1 + k4neg2).M();
+      const double m21k = (k4pos2 + k4neg1).M();
 
-      const double m11k = k4m11.M();
-      const double m22k = k4m22.M();
-
-      const double m12k = k4m12.M();
-      const double m21k = k4m21.M();
+      const double m4k = (k4pos1 + k4pos2 + k4neg1 + k4neg2).M();
 
       const double phiCen = 1.02;
       const double phiCut = 0.02;
@@ -1525,77 +1517,77 @@ bool PromptAnalyzer::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
         histosTH1F["hnKaons"]->Fill(nKaons);
 
         {
-          histosTH1F["hm4PHImass"]->Fill(mrec4k);
+          histosTH1F["hm4PHImass"]->Fill(m4k);
           for (const auto &in : dEdxInfo)
             histosTH2F["hdedx4PHImass"]->Fill(in.p, in.dEdx);
         }
 
         if (nKaons == 4)
         {
-          histosTH1F["hm4PHImass4curves"]->Fill(mrec4k);
+          histosTH1F["hm4PHImass4curves"]->Fill(m4k);
           for (const auto &in : dEdxInfo)
             histosTH2F["hdedx4PHImass4curves"]->Fill(in.p, in.dEdx);
         }
 
         if (nKaons == 3)
         {
-          histosTH1F["hm4PHImass3curves"]->Fill(mrec4k);
+          histosTH1F["hm4PHImass3curves"]->Fill(m4k);
           for (const auto &in : dEdxInfo)
             histosTH2F["hdedx4PHImass3curves"]->Fill(in.p, in.dEdx);
         }
 
         if (nKaons >= 3)
         {
-          histosTH1F["hm4PHImass34curves"]->Fill(mrec4k);
+          histosTH1F["hm4PHImass34curves"]->Fill(m4k);
           for (const auto &in : dEdxInfo)
             histosTH2F["hdedx4PHImass34curves"]->Fill(in.p, in.dEdx);
         }
 
         if (nKaons >= 2)
         {
-          histosTH1F["hm4PHImass234curves"]->Fill(mrec4k);
+          histosTH1F["hm4PHImass234curves"]->Fill(m4k);
           for (const auto &in : dEdxInfo)
             histosTH2F["hdedx4PHImass234curves"]->Fill(in.p, in.dEdx);
         }
 
         if (nKaons >= 1)
         {
-          histosTH1F["hm4PHImass1234curves"]->Fill(mrec4k);
+          histosTH1F["hm4PHImass1234curves"]->Fill(m4k);
           for (const auto &in : dEdxInfo)
             histosTH2F["hdedx4PHImass1234curves"]->Fill(in.p, in.dEdx);
         }
 
         if (twoKaonsOfTheSameSign)
         {
-          histosTH1F["hm4PHImass2SS"]->Fill(mrec4k);
+          histosTH1F["hm4PHImass2SS"]->Fill(m4k);
           for (const auto &in : dEdxInfo)
             histosTH2F["hdedx4PHImass2SS"]->Fill(in.p, in.dEdx);
         }
 
         if (nPions == 0 && nProtons == 0)
         {
-          histosTH1F["hm4PHImassPionProtonVeto"]->Fill(mrec4k);
+          histosTH1F["hm4PHImassPionProtonVeto"]->Fill(m4k);
           for (const auto &in : dEdxInfo)
             histosTH2F["hdedx4PHImassPionProtonVeto"]->Fill(in.p, in.dEdx);
         }
 
         if (nSafePions == 0 && nProtons == 0)
         {
-          histosTH1F["hm4PHImassSafePionProtonVeto"]->Fill(mrec4k);
+          histosTH1F["hm4PHImassSafePionProtonVeto"]->Fill(m4k);
           for (const auto &in : dEdxInfo)
             histosTH2F["hdedx4PHImassSafePionProtonVeto"]->Fill(in.p, in.dEdx);
         }
 
         if (nKaons >= 1 && nSafePions == 0 && nProtons == 0)
         {
-          histosTH1F["hm4PHImass1234curvesSafePionProtonVeto"]->Fill(mrec4k);
+          histosTH1F["hm4PHImass1234curvesSafePionProtonVeto"]->Fill(m4k);
           for (const auto &in : dEdxInfo)
             histosTH2F["hdedx4PHImass1234curvesSafePionProtonVeto"]->Fill(in.p, in.dEdx);
         }
 
         if (twoKaonsOfTheSameSign && nSafePions == 0 && nProtons == 0)
         {
-          histosTH1F["hm4PHImass2SSSafePionProtonVeto"]->Fill(mrec4k);
+          histosTH1F["hm4PHImass2SSSafePionProtonVeto"]->Fill(m4k);
           for (const auto &in : dEdxInfo)
             histosTH2F["hdedx4PHImass2SSSafePionProtonVeto"]->Fill(in.p, in.dEdx);
         }
@@ -1605,44 +1597,47 @@ bool PromptAnalyzer::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
       {
         histosTH1F["hnKaons_PhiCutStrict"]->Fill(nKaons);
 
-        histosTH1F["hm4PHImass_PhiCutStrict"]->Fill(mrec4k);
+        histosTH1F["hm4PHImass_PhiCutStrict"]->Fill(m4k);
 
-        if (nKaons == 4) histosTH1F["hm4PHImass4curves_PhiCutStrict"]->Fill(mrec4k);
-        if (nKaons == 3) histosTH1F["hm4PHImass3curves_PhiCutStrict"]->Fill(mrec4k);
+        if (nKaons == 4) histosTH1F["hm4PHImass4curves_PhiCutStrict"]->Fill(m4k);
+        if (nKaons == 3) histosTH1F["hm4PHImass3curves_PhiCutStrict"]->Fill(m4k);
 
-        if (nKaons >= 3) histosTH1F["hm4PHImass34curves_PhiCutStrict"]->Fill(mrec4k);
-        if (nKaons >= 2) histosTH1F["hm4PHImass234curves_PhiCutStrict"]->Fill(mrec4k);
-        if (nKaons >= 1) histosTH1F["hm4PHImass1234curves_PhiCutStrict"]->Fill(mrec4k);
+        if (nKaons >= 3) histosTH1F["hm4PHImass34curves_PhiCutStrict"]->Fill(m4k);
+        if (nKaons >= 2) histosTH1F["hm4PHImass234curves_PhiCutStrict"]->Fill(m4k);
+        if (nKaons >= 1) histosTH1F["hm4PHImass1234curves_PhiCutStrict"]->Fill(m4k);
 
         if (twoKaonsOfTheSameSign)
         {
-          histosTH1F["hm4PHImass2SS_PhiCutStrict"]->Fill(mrec4k);
+          histosTH1F["hm4PHImass2SS_PhiCutStrict"]->Fill(m4k);
         }
 
         if (nSafePions == 0 && nProtons == 0)
         {
-          histosTH1F["hm4PHImassSafePionProtonVeto_PhiCutStrict"]->Fill(mrec4k);
+          histosTH1F["hm4PHImassSafePionProtonVeto_PhiCutStrict"]->Fill(m4k);
         }
 
         if (nKaons >= 1 && nSafePions == 0 && nProtons == 0)
         {
-          histosTH1F["hm4PHImass1234curvesSafePionProtonVeto_PhiCutStrict"]->Fill(mrec4k);
+          histosTH1F["hm4PHImass1234curvesSafePionProtonVeto_PhiCutStrict"]->Fill(m4k);
         }
 
         if (twoKaonsOfTheSameSign && nSafePions == 0 && nProtons == 0)
         {
-          histosTH1F["hm4PHImass2SSSafePionProtonVeto_PhiCutStrict"]->Fill(mrec4k);
+          histosTH1F["hm4PHImass2SSSafePionProtonVeto_PhiCutStrict"]->Fill(m4k);
         }
       }
 
       // begin: test code
-      if (nOKPhiCut > 0 && mrec4k > 2.210 && mrec4k < 2.225)
+      if (nOKPhiCut > 0 && m4k > 2.210 && m4k < 2.225)
       {
-          histosTH1F["h_m_4K_PEAK"]->Fill(mrec4k);
+          histosTH1F["h_m_4K_PEAK"]->Fill(m4k);
           histosTH1F["h_m_4pi_PEAK"]->Fill(mrec4);
 
           histosTH2F["hmALLpiKen0_2D_PEAK"]->Fill(m11, m22);
           histosTH2F["hmALLpiKen0_2D_PEAK"]->Fill(m12, m21);
+
+          for (const auto &in : dEdxInfo)
+            histosTH2F["hdedx4PHImass_PEAK"]->Fill(in.p, in.dEdx);
       }
       // end: test code
 
