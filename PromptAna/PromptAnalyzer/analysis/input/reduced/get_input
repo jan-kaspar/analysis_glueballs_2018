@@ -15,7 +15,7 @@ function GetOne()
 
 #----------------------------------------------------------------------------------------------------
 
-eos_dir="/eos/totem/data/ctpps/reconstruction/2018/90m/AOD_skim/version3"
+eos_dir="/eos/totem/data/ctpps/reconstruction/2018/90m/AOD_skim/version4"
 
 GetOne "TOTEM2" "319176"
 GetOne "TOTEM2" "319256"
